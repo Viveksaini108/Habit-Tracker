@@ -18,17 +18,17 @@ function Tips({ tips }) {
     <div className="mt-3">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-600 transition hover:text-brand-700"
+        className="inline-flex items-center gap-1.5 text-xs font-bold text-accent transition hover:text-accent-strong"
       >
         <IconSparkles className="h-3.5 w-3.5" />
         Ways to improve & stick with it
         <IconChevronDown className={`h-3.5 w-3.5 transition ${open ? 'rotate-180' : ''}`} />
       </button>
       {open ? (
-        <ul className="mt-2 space-y-1.5 rounded-xl bg-brand-50/60 p-3">
+        <ul className="mt-2 space-y-1.5 rounded-xl bg-accent/10 p-3">
           {tips.map((tip, i) => (
-            <li key={i} className="flex items-start gap-2 text-xs leading-relaxed text-slate-600">
-              <span className="tnum mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-brand-100 text-[9px] font-extrabold text-brand-700">
+            <li key={i} className="flex items-start gap-2 text-xs leading-relaxed text-ink2">
+              <span className="tnum mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-accent/15 text-[9px] font-extrabold text-accent-strong">
                 {i + 1}
               </span>
               {tip}
@@ -124,13 +124,13 @@ export default function ChallengesClient({ initial }) {
 
   return (
     <div>
-      <div className="mb-5 flex gap-1 rounded-xl bg-white p-1 ring-1 ring-slate-200 w-fit">
+      <div className="mb-5 flex gap-1 rounded-xl bg-surface p-1 ring-1 ring-line w-fit">
         {tabs.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`rounded-lg px-4 py-1.5 text-sm font-bold transition ${
-              tab === t.id ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+              tab === t.id ? 'bg-ink text-page shadow-sm' : 'text-muted hover:text-ink'
             }`}
           >
             {t.label}
@@ -143,7 +143,7 @@ export default function ChallengesClient({ initial }) {
       {tab === 'active' ? (
         state.active.length === 0 ? (
           <EmptyState
-            icon="🏁"
+            mascot="wave"
             title="No active challenges"
             body="Challenges give your habits a finish line and a story. Pick one from the Discover tab — start with something easy."
             action={
@@ -156,16 +156,16 @@ export default function ChallengesClient({ initial }) {
               <div key={c.uc_id} className="card p-5">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="text-sm font-bold text-slate-900">{c.title}</p>
+                    <p className="text-sm font-bold text-ink">{c.title}</p>
                     <div className="mt-1.5 flex flex-wrap gap-1.5">
                       <Badge color={DIFFICULTY[c.difficulty]?.color ?? '#64748b'}>{c.difficulty}</Badge>
                       <Badge color="#64748b">{c.category}</Badge>
                     </div>
                   </div>
-                  <span className="tnum text-lg font-extrabold text-brand-600">{c.progress}%</span>
+                  <span className="tnum text-lg font-extrabold text-accent">{c.progress}%</span>
                 </div>
-                <ProgressBar value={c.progress} color="#6366f1" className="mt-3" />
-                <p className="mt-2 flex items-center gap-1.5 text-xs text-slate-400">
+                <ProgressBar value={c.progress} className="mt-3" />
+                <p className="mt-2 flex items-center gap-1.5 text-xs text-faint">
                   <IconClock className="h-3.5 w-3.5" />
                   Day {c.elapsed} of {c.duration_days} · {c.daysLeft} to go · started {c.started_at}
                 </p>
@@ -182,7 +182,7 @@ export default function ChallengesClient({ initial }) {
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="text-slate-500"
+                    className="text-muted"
                     onClick={() => setStatus(c, 'abandoned')}
                     loading={busy === `abandoned-${c.uc_id}`}
                     disabled={String(c.uc_id).startsWith('tmp-')}
@@ -202,13 +202,13 @@ export default function ChallengesClient({ initial }) {
             <div key={c.id} className={`card flex flex-col p-5 ${c.joined ? 'ring-2 ring-emerald-200' : ''}`}>
               <div className="flex items-center justify-between">
                 <Badge color={DIFFICULTY[c.difficulty]?.color ?? '#64748b'}>{c.difficulty}</Badge>
-                <span className="tnum flex items-center gap-1 text-xs font-bold text-slate-400">
+                <span className="tnum flex items-center gap-1 text-xs font-bold text-faint">
                   <IconClock className="h-3.5 w-3.5" /> {c.duration_days} days
                 </span>
               </div>
-              <p className="mt-3 text-sm font-bold text-slate-900">{c.title}</p>
+              <p className="mt-3 text-sm font-bold text-ink">{c.title}</p>
               <Badge color="#94a3b8" className="mt-1.5 w-fit">{c.category}</Badge>
-              <p className="mt-2 flex-1 text-xs leading-relaxed text-slate-500">{c.description}</p>
+              <p className="mt-2 flex-1 text-xs leading-relaxed text-muted">{c.description}</p>
               <Tips tips={c.tips} />
               <div className="mt-4">
                 {c.joined ? (
@@ -233,7 +233,7 @@ export default function ChallengesClient({ initial }) {
       {tab === 'history' ? (
         state.history.length === 0 ? (
           <EmptyState
-            icon="🕰️"
+            mascot="sleep"
             title="No past challenges"
             body="Completed and given-up challenges land here, so you can see your journey and restart anytime."
           />
@@ -243,14 +243,14 @@ export default function ChallengesClient({ initial }) {
               <div key={c.uc_id} className="card flex flex-wrap items-center gap-3 p-4">
                 <span
                   className={`flex h-9 w-9 items-center justify-center rounded-xl ${
-                    c.status === 'completed' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-400'
+                    c.status === 'completed' ? 'bg-emerald-50 text-emerald-600' : 'bg-soft2 text-faint'
                   }`}
                 >
                   {c.status === 'completed' ? '🏆' : '⏸️'}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-bold text-slate-900">{c.title}</p>
-                  <p className="text-xs capitalize text-slate-400">
+                  <p className="truncate text-sm font-bold text-ink">{c.title}</p>
+                  <p className="text-xs capitalize text-faint">
                     {c.status} · {c.started_at} → {c.ended_at} · {c.duration_days}-day challenge
                   </p>
                 </div>

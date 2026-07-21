@@ -21,7 +21,7 @@ function MonthGrid({ heatmap }) {
     <div>
       <div className="mb-1 grid grid-cols-7 gap-1">
         {WEEKDAYS.map((d) => (
-          <span key={d} className="pb-1 text-center text-[10px] font-bold uppercase text-slate-400">
+          <span key={d} className="pb-1 text-center text-[10px] font-bold uppercase text-faint">
             {d.slice(0, 2)}
           </span>
         ))}
@@ -34,19 +34,19 @@ function MonthGrid({ heatmap }) {
             <div
               key={d.key}
               title={`${d.key} — ${d.isFuture ? 'upcoming' : d.active ? `${d.pct}% complete` : 'no habits scheduled'}`}
-              className="tnum flex aspect-square items-center justify-center rounded-md text-[10px] font-bold transition hover:ring-2 hover:ring-brand-300"
+              className="tnum flex aspect-square items-center justify-center rounded-md text-[10px] font-bold transition hover:ring-2 hover:ring-accent/50"
               style={{
                 backgroundColor: d.isFuture
-                  ? '#f8fafc'
+                  ? 'rgb(var(--soft))'
                   : intensity >= 80
-                    ? '#6366f1'
+                    ? 'rgb(var(--accent))'
                     : intensity >= 50
-                      ? '#a5b4fc'
+                      ? 'rgb(var(--accent) / 0.45)'
                       : intensity > 0
-                        ? '#e0e7ff'
-                        : '#f1f5f9',
-                color: intensity >= 80 ? '#fff' : intensity >= 50 ? '#312e81' : '#94a3b8',
-                border: d.isFuture ? '1px dashed #e2e8f0' : 'none',
+                        ? 'rgb(var(--accent) / 0.14)'
+                        : 'rgb(var(--soft2))',
+                color: intensity >= 80 && !d.isFuture ? '#fff' : intensity >= 50 ? 'rgb(var(--accent))' : 'rgb(var(--faint))',
+                border: d.isFuture ? '1px dashed rgb(var(--line))' : 'none',
               }}
             >
               {d.dateNum}
@@ -106,13 +106,13 @@ export default function AnalyticsClient({ initialData, initialMonth }) {
     <div>
       {/* Controls */}
       <div className="mb-5 flex flex-wrap items-center gap-3">
-        <div className="flex rounded-xl bg-white p-1 ring-1 ring-slate-200">
+        <div className="flex rounded-xl bg-surface p-1 ring-1 ring-line">
           {['week', 'month'].map((p) => (
             <button
               key={p}
               onClick={() => switchPeriod(p)}
               className={`rounded-lg px-4 py-1.5 text-sm font-bold capitalize transition ${
-                period === p ? 'bg-slate-900 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                period === p ? 'bg-ink text-page shadow-sm' : 'text-muted hover:text-ink'
               }`}
             >
               {p}
@@ -124,18 +124,18 @@ export default function AnalyticsClient({ initialData, initialMonth }) {
           <div className="flex items-center gap-1">
             <button
               onClick={() => shiftWeek(-1)}
-              className="rounded-lg bg-white p-2 text-slate-500 ring-1 ring-slate-200 transition hover:text-slate-900"
+              className="rounded-lg bg-surface p-2 text-muted ring-1 ring-line transition hover:text-ink"
               aria-label="Previous week"
             >
               <IconChevronLeft className="h-4 w-4" />
             </button>
-            <span className="min-w-[150px] text-center text-sm font-bold text-slate-700">
+            <span className="min-w-[150px] text-center text-sm font-bold text-ink2">
               {offset === 0 ? 'This week' : offset === -1 ? 'Last week' : `${-offset} weeks ago`}
             </span>
             <button
               onClick={() => shiftWeek(1)}
               disabled={offset === 0}
-              className="rounded-lg bg-white p-2 text-slate-500 ring-1 ring-slate-200 transition hover:text-slate-900 disabled:opacity-40"
+              className="rounded-lg bg-surface p-2 text-muted ring-1 ring-line transition hover:text-ink disabled:opacity-40"
               aria-label="Next week"
             >
               <IconChevronRight className="h-4 w-4" />
@@ -143,7 +143,7 @@ export default function AnalyticsClient({ initialData, initialMonth }) {
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <IconCalendar className="h-4 w-4 text-slate-400" />
+            <IconCalendar className="h-4 w-4 text-faint" />
             <input
               type="month"
               className="input h-9 w-[170px] py-1"
@@ -154,7 +154,7 @@ export default function AnalyticsClient({ initialData, initialMonth }) {
           </div>
         )}
 
-        <span className="ml-auto text-xs font-semibold text-slate-400">{data.label}</span>
+        <span className="ml-auto text-xs font-semibold text-faint">{data.label}</span>
       </div>
 
       {error ? <p className="mb-4 rounded-lg bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700">{error}</p> : null}
@@ -170,7 +170,7 @@ export default function AnalyticsClient({ initialData, initialMonth }) {
               ? 'same as previous period'
               : `${delta > 0 ? '▲' : '▼'} ${Math.abs(delta)} pts vs previous ${data.period}`
           }
-          accent="#6366f1"
+          accent="rgb(var(--accent))"
         />
         <StatCard
           icon={<IconCheck className="h-5 w-5" />}
@@ -198,25 +198,25 @@ export default function AnalyticsClient({ initialData, initialMonth }) {
       {/* Charts */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="card p-5 lg:col-span-2">
-          <h3 className="mb-1 text-sm font-bold text-slate-900">60-day completion trend</h3>
-          <p className="mb-3 text-xs text-slate-400">Daily percentage of scheduled habits completed.</p>
+          <h3 className="mb-1 text-sm font-bold text-ink">60-day completion trend</h3>
+          <p className="mb-3 text-xs text-faint">Daily percentage of scheduled habits completed.</p>
           {loading ? <Skeleton className="h-[220px]" /> : <TrendChart data={data.trend} />}
         </div>
 
         <div className="card p-5">
-          <h3 className="mb-3 text-sm font-bold text-slate-900">
+          <h3 className="mb-3 text-sm font-bold text-ink">
             {period === 'week' ? 'Completions by day' : 'Completions by week'}
           </h3>
           {loading ? <Skeleton className="h-[220px]" /> : <CompletionBars data={bars} labelKey={barLabelKey} />}
         </div>
 
         <div className="card p-5">
-          <h3 className="mb-3 text-sm font-bold text-slate-900">Check-ins by category</h3>
+          <h3 className="mb-3 text-sm font-bold text-ink">Check-ins by category</h3>
           {loading ? <Skeleton className="h-[220px]" /> : <CategoryDonut data={data.categories} />}
         </div>
 
         <div className="card p-5">
-          <h3 className="mb-4 text-sm font-bold text-slate-900">Habit leaderboard</h3>
+          <h3 className="mb-4 text-sm font-bold text-ink">Habit leaderboard</h3>
           {loading ? (
             <div className="space-y-3">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -224,7 +224,7 @@ export default function AnalyticsClient({ initialData, initialMonth }) {
               ))}
             </div>
           ) : data.perHabit.length === 0 ? (
-            <p className="rounded-xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-400">
+            <p className="rounded-xl bg-soft px-4 py-6 text-center text-sm text-faint">
               No habits were active in this period.
             </p>
           ) : (
@@ -232,16 +232,16 @@ export default function AnalyticsClient({ initialData, initialMonth }) {
               {data.perHabit.map((h) => (
                 <div key={h.id} className="flex items-center gap-3">
                   <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: h.color }} />
-                  <span className="w-40 truncate text-sm font-semibold text-slate-700" title={h.name}>
+                  <span className="w-40 truncate text-sm font-semibold text-ink2" title={h.name}>
                     {h.name}
                   </span>
-                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-soft2">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{ width: `${h.pct}%`, backgroundColor: h.color }}
                     />
                   </div>
-                  <span className="tnum w-10 text-right text-xs font-bold text-slate-600">{h.pct}%</span>
+                  <span className="tnum w-10 text-right text-xs font-bold text-ink2">{h.pct}%</span>
                   <span className="tnum inline-flex w-12 items-center justify-end gap-0.5 text-xs font-bold text-orange-500">
                     {h.streak > 0 ? (
                       <>
@@ -253,14 +253,14 @@ export default function AnalyticsClient({ initialData, initialMonth }) {
               ))}
             </div>
           )}
-          <p className="mt-3 text-[11px] text-slate-400">
+          <p className="mt-3 text-[11px] text-faint">
             Percentage is normalized to each habit’s weekly target — a 3×/week habit that hit 3 sessions shows 100%.
           </p>
         </div>
 
         <div className="card p-5">
-          <h3 className="mb-1 text-sm font-bold text-slate-900">{data.label} — intensity map</h3>
-          <p className="mb-4 text-xs text-slate-400">Darker squares mean a fuller day.</p>
+          <h3 className="mb-1 text-sm font-bold text-ink">{data.label} — intensity map</h3>
+          <p className="mb-4 text-xs text-faint">Darker squares mean a fuller day.</p>
           <MonthGrid heatmap={data.heatmap} />
         </div>
       </div>
@@ -268,21 +268,21 @@ export default function AnalyticsClient({ initialData, initialMonth }) {
       {/* Insights */}
       {data.insights?.length ? (
         <div className="card mt-4 p-5">
-          <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-900">
+          <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-ink">
             <span className="text-base">🚀</span> Ways to improve — personalized for you
           </h3>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             {data.insights.map((ins) => {
               const Icon = ICON_MAP[ins.icon] ?? ICON_MAP.sparkles;
               return (
-                <div key={ins.title} className="rounded-xl border border-slate-100 bg-slate-50/60 p-4">
-                  <p className="flex items-center gap-2 text-sm font-bold text-slate-800">
-                    <span className="text-brand-500">
+                <div key={ins.title} className="rounded-xl border border-line-soft bg-soft/60 p-4">
+                  <p className="flex items-center gap-2 text-sm font-bold text-ink">
+                    <span className="text-accent">
                       <Icon className="h-4 w-4" />
                     </span>
                     {ins.title}
                   </p>
-                  <p className="mt-1.5 text-xs leading-relaxed text-slate-500">{ins.body}</p>
+                  <p className="mt-1.5 text-xs leading-relaxed text-muted">{ins.body}</p>
                 </div>
               );
             })}

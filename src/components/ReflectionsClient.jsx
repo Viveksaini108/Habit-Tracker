@@ -39,8 +39,8 @@ function ReflectionCard({ reflection, onEdit, onDelete }) {
     <div className="card p-4">
       <div className="flex w-full items-center justify-between gap-3">
         <button onClick={() => setOpen((v) => !v)} className="min-w-0 flex-1 text-left" aria-expanded={open}>
-          <p className="text-sm font-bold text-slate-900">{reflection.label}</p>
-          <p className="mt-0.5 text-xs text-slate-400">
+          <p className="text-sm font-bold text-ink">{reflection.label}</p>
+          <p className="mt-0.5 text-xs text-faint">
             Updated {reflection.updated_at?.slice(0, 10)}
           </p>
         </button>
@@ -48,7 +48,7 @@ function ReflectionCard({ reflection, onEdit, onDelete }) {
           <StarRating value={reflection.rating} readOnly />
           <button
             onClick={() => setOpen((v) => !v)}
-            className="rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            className="rounded-lg p-1 text-faint transition hover:bg-soft2 hover:text-ink2"
             aria-label={open ? 'Collapse' : 'Expand'}
           >
             <IconChevronDown className={`h-4 w-4 transition ${open ? 'rotate-180' : ''}`} />
@@ -56,12 +56,12 @@ function ReflectionCard({ reflection, onEdit, onDelete }) {
         </div>
       </div>
       {open ? (
-        <div className="mt-4 space-y-3 border-t border-slate-100 pt-4">
+        <div className="mt-4 space-y-3 border-t border-line-soft pt-4">
           {FIELDS.map((f) =>
             reflection[f.key] ? (
               <div key={f.key}>
-                <p className="text-xs font-bold text-slate-500">{f.label}</p>
-                <p className="mt-1 whitespace-pre-wrap text-sm text-slate-600">{reflection[f.key]}</p>
+                <p className="text-xs font-bold text-muted">{f.label}</p>
+                <p className="mt-1 whitespace-pre-wrap text-sm text-ink2">{reflection[f.key]}</p>
               </div>
             ) : null
           )}
@@ -175,8 +175,8 @@ export default function ReflectionsClient({ initialReflections, currentMonth }) 
       <div className="card h-fit p-5 lg:col-span-3">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="text-sm font-bold text-slate-900">Monthly reflection</h3>
-            <p className="text-xs text-slate-400">Two honest minutes a month will teach you more than any chart.</p>
+            <h3 className="text-sm font-bold text-ink">Monthly reflection</h3>
+            <p className="text-xs text-faint">Two honest minutes a month will teach you more than any chart.</p>
           </div>
           <input
             type="month"
@@ -201,9 +201,9 @@ export default function ReflectionsClient({ initialReflections, currentMonth }) 
             </div>
           ))}
 
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-slate-50 p-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-soft p-3">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wide text-slate-500">How was the month overall?</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-muted">How was the month overall?</p>
               <StarRating value={draft.rating} onChange={(n) => patch({ rating: n })} />
             </div>
             <Button onClick={save} loading={saving}>
@@ -222,12 +222,12 @@ export default function ReflectionsClient({ initialReflections, currentMonth }) 
 
       {/* Past reflections */}
       <div className="lg:col-span-2">
-        <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-900">
-          <IconJournal className="h-4 w-4 text-brand-500" /> Past reflections
+        <h3 className="mb-3 flex items-center gap-2 text-sm font-bold text-ink">
+          <IconJournal className="h-4 w-4 text-accent" /> Past reflections
         </h3>
         {reflections.length === 0 ? (
           <EmptyState
-            icon="📔"
+            mascot="happy"
             title="No reflections yet"
             body="Write your first monthly reflection on the left — it only takes a couple of minutes and future-you will thank you."
           />
@@ -246,8 +246,8 @@ export default function ReflectionsClient({ initialReflections, currentMonth }) 
       </div>
 
       <Modal open={!!deleting} onClose={() => setDeleting(null)} title="Delete reflection?">
-        <p className="text-sm text-slate-600">
-          Your reflection for <strong className="text-slate-900">{deleting?.label}</strong> will be permanently removed.
+        <p className="text-sm text-ink2">
+          Your reflection for <strong className="text-ink">{deleting?.label}</strong> will be permanently removed.
         </p>
         <div className="mt-5 flex justify-end gap-2">
           <Button variant="secondary" onClick={() => setDeleting(null)}>Cancel</Button>

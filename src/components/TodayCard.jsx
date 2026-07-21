@@ -15,7 +15,7 @@ export default function TodayCard({ todayList, today, categories }) {
   return (
     <div className="card p-5">
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-sm font-bold text-slate-900">Today’s habits</h3>
+        <h3 className="text-sm font-bold text-ink">Today’s habits</h3>
         <Button size="sm" variant="soft" onClick={() => setFormOpen(true)}>
           <IconPlus className="h-4 w-4" /> New habit
         </Button>

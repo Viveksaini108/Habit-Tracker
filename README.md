@@ -13,6 +13,8 @@ A full-stack habit tracker that feels alive from the first load: daily check-ins
 - **Analytics** — weekly & monthly reports: 60-day completion trend, per-day / per-week bars, category donut, habit leaderboard (normalized to weekly targets), month intensity map, deltas vs previous period, and **personalized “ways to improve”** insights derived from your real data.
 - **Monthly reflections** — wins / challenges / learnings / next-month focus + a 5-star rating, one per month, full history with edit & delete.
 - **Challenges** — a seeded library of 10 challenges, each with duration, difficulty and practical tips (“ways to improve”); join, track progress, complete, give up, restart.
+- **Themes** — 6 pre-installed themes (Daylight, Midnight, Ocean, Forest, Sunset, Candy) built on CSS custom properties; instant switching from the sidebar picker, persisted via cookie so there’s no flash on load.
+- **Playful motion** — Bloop, an animated SVG mascot (blinks, waves, celebrates), shine-sweep buttons, springy checkbox draw animation, shimmer skeletons, hover-lift cards, and a confetti burst when you complete every habit for the day. Respects `prefers-reduced-motion`.
 - **UX polish** — empty states, loading skeletons, optimistic updates with rollback, error messaging, fully responsive (mobile slide-over nav).
 - **Persistent storage** — SQLite via Node 22’s built-in `node:sqlite` (zero native dependencies), auto-seeded on first boot.
 

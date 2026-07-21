@@ -43,7 +43,7 @@ export default async function HabitDetailPage({ params }) {
     <div className="animate-fade-up">
       <Link
         href="/habits"
-        className="mb-4 inline-flex items-center gap-1 text-sm font-semibold text-slate-400 transition hover:text-slate-700"
+        className="mb-4 inline-flex items-center gap-1 text-sm font-semibold text-faint transition hover:text-ink2"
       >
         <IconChevronLeft className="h-4 w-4" /> All habits
       </Link>

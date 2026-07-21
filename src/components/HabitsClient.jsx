@@ -79,8 +79,8 @@ export default function HabitsClient({ initialHabits, categories, today, archive
             onClick={() => setFilter(f)}
             className={`rounded-full px-3.5 py-1.5 text-xs font-bold capitalize transition ${
               filter === f
-                ? 'bg-slate-900 text-white shadow-sm'
-                : 'bg-white text-slate-500 ring-1 ring-slate-200 hover:ring-slate-300'
+                ? 'bg-ink text-page shadow-sm'
+                : 'bg-surface text-muted ring-1 ring-line hover:ring-line-strong'
             }`}
           >
             {f}
@@ -103,7 +103,7 @@ export default function HabitsClient({ initialHabits, categories, today, archive
 
       {visible.length === 0 ? (
         <EmptyState
-          icon={filter === 'archived' ? '🗄️' : '✨'}
+          mascot={filter === 'archived' ? 'sleep' : 'celebrate'}
           title={filter === 'archived' ? 'Nothing archived' : filter === 'active' ? 'No habits yet' : `No habits in “${filter}”`}
           body={
             filter === 'active'
@@ -143,8 +143,8 @@ export default function HabitsClient({ initialHabits, categories, today, archive
       <CategoryManager open={catsOpen} onClose={() => setCatsOpen(false)} categories={categories} onChanged={refresh} />
 
       <Modal open={!!deleting} onClose={() => setDeleting(null)} title="Delete habit?">
-        <p className="text-sm text-slate-600">
-          <strong className="text-slate-900">{deleting?.name}</strong> and all of its check-ins and notes will be
+        <p className="text-sm text-ink2">
+          <strong className="text-ink">{deleting?.name}</strong> and all of its check-ins and notes will be
           permanently removed. If you want to keep the history, archive it instead.
         </p>
         <div className="mt-5 flex justify-end gap-2">

@@ -73,7 +73,7 @@ export default function RegisterForm() {
           autoComplete="new-password"
           required
         />
-        <p className="mt-1.5 text-xs text-slate-400">At least 8 characters. We start you off with four starter categories.</p>
+        <p className="mt-1.5 text-xs text-faint">At least 8 characters. We start you off with four starter categories.</p>
       </div>
 
       {error ? (

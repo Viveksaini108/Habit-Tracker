@@ -42,16 +42,16 @@ export default function LoginForm() {
       <button
         type="button"
         onClick={useDemo}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border border-brand-200 bg-brand-50 px-4 py-2.5 text-sm font-semibold text-brand-700 transition hover:border-brand-300 hover:bg-brand-100"
+        className="flex w-full items-center justify-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2.5 text-sm font-semibold text-accent-strong transition hover:border-accent/50 hover:bg-accent/15"
       >
         <IconSparkles className="h-4 w-4" />
         Explore with the demo account
       </button>
 
-      <div className="relative flex items-center gap-3 text-xs font-medium text-slate-400">
-        <span className="h-px flex-1 bg-slate-200" />
+      <div className="relative flex items-center gap-3 text-xs font-medium text-faint">
+        <span className="h-px flex-1 bg-soft2" />
         or sign in with your email
-        <span className="h-px flex-1 bg-slate-200" />
+        <span className="h-px flex-1 bg-soft2" />
       </div>
 
       <div>
@@ -90,7 +90,7 @@ export default function LoginForm() {
       <Button type="submit" loading={loading} className="w-full">
         Sign in
       </Button>
-      <p className="text-center text-xs text-slate-400">
+      <p className="text-center text-xs text-faint">
         Demo account: demo@habitflow.app · demo1234
       </p>
     </form>

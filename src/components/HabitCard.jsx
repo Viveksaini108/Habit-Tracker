@@ -14,8 +14,8 @@ function SevenDots({ last7, color }) {
           title={`${d.key} — ${d.done ? 'done' : d.active ? 'missed' : 'inactive'}`}
           className="h-2.5 w-2.5 rounded-full transition"
           style={{
-            backgroundColor: d.done ? color : d.active ? '#e2e8f0' : '#f1f5f9',
-            outline: d.done ? 'none' : d.active ? '1px solid #e2e8f0' : '1px dashed #e2e8f0',
+            backgroundColor: d.done ? color : d.active ? 'rgb(var(--soft2))' : 'rgb(var(--soft))',
+            outline: d.done ? 'none' : d.active ? '1px solid rgb(var(--soft2))' : '1px dashed rgb(var(--line))',
           }}
         />
       ))}
@@ -28,12 +28,12 @@ export default function HabitCard({ habit, onEdit, onArchive, onDelete }) {
   const s = habit.stats;
 
   return (
-    <div className={`card group relative flex flex-col p-4 transition hover:shadow-pop ${habit.archived ? 'opacity-75' : ''}`}>
+    <div className={`card group relative flex flex-col p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-pop ${habit.archived ? 'opacity-75' : ''}`}>
       <div className="flex items-start justify-between gap-2">
         <Link href={`/habits/${habit.id}`} className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: habit.color }} />
-            <p className="truncate text-sm font-bold text-slate-900 transition group-hover:text-brand-700">
+            <p className="truncate text-sm font-bold text-ink transition group-hover:text-accent-strong">
               {habit.name}
             </p>
           </div>
@@ -55,7 +55,7 @@ export default function HabitCard({ habit, onEdit, onArchive, onDelete }) {
         <div className="relative">
           <button
             onClick={() => setMenuOpen((v) => !v)}
-            className="rounded-lg p-1.5 text-slate-300 transition hover:bg-slate-100 hover:text-slate-600"
+            className="rounded-lg p-1.5 text-faint transition hover:bg-soft2 hover:text-ink2"
             aria-label="Habit actions"
           >
             <IconPencil className="h-4 w-4" />
@@ -63,16 +63,16 @@ export default function HabitCard({ habit, onEdit, onArchive, onDelete }) {
           {menuOpen ? (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-              <div className="absolute right-0 z-20 mt-1 w-40 animate-scale-in overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-pop">
+              <div className="absolute right-0 z-20 mt-1 w-40 animate-scale-in overflow-hidden rounded-xl border border-line bg-surface py-1 shadow-pop">
                 <button
                   onClick={() => { setMenuOpen(false); onEdit(habit); }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-medium text-ink2 transition hover:bg-soft"
                 >
                   <IconPencil className="h-4 w-4" /> Edit
                 </button>
                 <button
                   onClick={() => { setMenuOpen(false); onArchive(habit); }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-medium text-ink2 transition hover:bg-soft"
                 >
                   {habit.archived ? <IconRefresh className="h-4 w-4" /> : <IconArchive className="h-4 w-4" />}
                   {habit.archived ? 'Restore' : 'Archive'}
@@ -90,15 +90,15 @@ export default function HabitCard({ habit, onEdit, onArchive, onDelete }) {
       </div>
 
       <Link href={`/habits/${habit.id}`} className="mt-3 flex-1">
-        <div className="flex items-center justify-between text-xs text-slate-400">
+        <div className="flex items-center justify-between text-xs text-faint">
           <span>Last 7 days</span>
           <SevenDots last7={s.last7} color={habit.color} />
         </div>
         <div className="mt-3 flex items-center gap-2">
           <ProgressBar value={Math.round(s.weekRate * 100)} color={habit.color} className="flex-1" />
-          <span className="tnum text-xs font-bold text-slate-600">{Math.round(s.weekRate * 100)}%</span>
+          <span className="tnum text-xs font-bold text-ink2">{Math.round(s.weekRate * 100)}%</span>
         </div>
-        <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400">
+        <div className="mt-2 flex items-center justify-between text-[11px] text-faint">
           <span>this week ({habit.target_per_week}× target)</span>
           <span className="tnum">{s.total} total check-ins</span>
         </div>

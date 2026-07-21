@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -16,46 +17,73 @@ import {
   Legend,
 } from 'recharts';
 
-const tooltipStyle = {
+/** Read the active theme's CSS variables (+ re-read when the theme changes). */
+function useThemeColors() {
+  const read = () => {
+    if (typeof window === 'undefined') return null;
+    const cs = getComputedStyle(document.documentElement);
+    const tri = (name, fallback) => {
+      const v = cs.getPropertyValue(name).trim();
+      return v || fallback;
+    };
+    return {
+      accent: `rgb(${tri('--accent', '99 102 241')})`,
+      accentSoft: `rgb(${tri('--accent', '99 102 241')} / 0.45)`,
+      accentFaint: `rgb(${tri('--accent', '99 102 241')} / 0.12)`,
+      grid: `rgb(${tri('--line', '226 232 240')})`,
+      tick: `rgb(${tri('--faint', '148 163 184')})`,
+      card: `rgb(${tri('--card', '255 255 255')})`,
+      ink: `rgb(${tri('--ink', '15 23 42')})`,
+    };
+  };
+
+  const [colors, setColors] = useState(read);
+  useEffect(() => {
+    setColors(read());
+    const onTheme = () => setColors(read());
+    window.addEventListener('hf-theme-change', onTheme);
+    return () => window.removeEventListener('hf-theme-change', onTheme);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return colors;
+}
+
+const TOOLTIP_STYLE = {
   borderRadius: 12,
-  border: '1px solid #e2e8f0',
-  boxShadow: '0 8px 24px rgba(15,23,42,0.08)',
+  border: 'none',
+  boxShadow: '0 10px 28px rgba(15,23,42,0.16)',
   fontSize: 12,
   fontWeight: 600,
 };
 
 /** 60-day completion trend (area). */
 export function TrendChart({ data }) {
+  const c = useThemeColors();
+  if (!c) return <div className="h-[220px]" />;
   return (
     <ResponsiveContainer width="100%" height={220}>
       <AreaChart data={data} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
         <defs>
           <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#6366f1" stopOpacity={0.35} />
-            <stop offset="100%" stopColor="#6366f1" stopOpacity={0.02} />
+            <stop offset="0%" stopColor={c.accent} stopOpacity={0.35} />
+            <stop offset="100%" stopColor={c.accent} stopOpacity={0.02} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-        <XAxis
-          dataKey="label"
-          tickLine={false}
-          axisLine={false}
-          tick={{ fontSize: 10, fill: '#94a3b8' }}
-          interval={9}
-        />
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={c.grid} />
+        <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: c.tick }} interval={9} />
         <YAxis
           domain={[0, 100]}
           tickLine={false}
           axisLine={false}
-          tick={{ fontSize: 10, fill: '#94a3b8' }}
+          tick={{ fontSize: 10, fill: c.tick }}
           tickFormatter={(v) => `${v}%`}
         />
         <Tooltip
-          contentStyle={tooltipStyle}
+          contentStyle={{ ...TOOLTIP_STYLE, backgroundColor: c.card, color: c.ink }}
           formatter={(v) => (v == null ? ['no habits yet', 'Completion'] : [`${v}%`, 'Completion'])}
           labelFormatter={(l) => `Date: ${l}`}
         />
-        <Area type="monotone" dataKey="pct" stroke="#6366f1" strokeWidth={2.5} fill="url(#trendFill)" connectNulls />
+        <Area type="monotone" dataKey="pct" stroke={c.accent} strokeWidth={2.5} fill="url(#trendFill)" connectNulls />
       </AreaChart>
     </ResponsiveContainer>
   );
@@ -63,24 +91,30 @@ export function TrendChart({ data }) {
 
 /** Daily (week view) or weekly (month view) completion bars. */
 export function CompletionBars({ data, dataKey = 'pct', labelKey = 'day' }) {
+  const c = useThemeColors();
+  if (!c) return <div className="h-[220px]" />;
   return (
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={data} margin={{ top: 8, right: 8, left: -18, bottom: 0 }} barCategoryGap="22%">
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-        <XAxis dataKey={labelKey} tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: '#94a3b8' }} />
+        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={c.grid} />
+        <XAxis dataKey={labelKey} tickLine={false} axisLine={false} tick={{ fontSize: 10, fill: c.tick }} />
         <YAxis
           domain={[0, 100]}
           tickLine={false}
           axisLine={false}
-          tick={{ fontSize: 10, fill: '#94a3b8' }}
+          tick={{ fontSize: 10, fill: c.tick }}
           tickFormatter={(v) => `${v}%`}
         />
-        <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`${v}%`, 'Completion']} cursor={{ fill: 'rgba(99,102,241,0.06)' }} />
+        <Tooltip
+          contentStyle={{ ...TOOLTIP_STYLE, backgroundColor: c.card, color: c.ink }}
+          formatter={(v) => [`${v}%`, 'Completion']}
+          cursor={{ fill: c.accentFaint }}
+        />
         <Bar dataKey={dataKey} radius={[6, 6, 2, 2]} maxBarSize={44}>
           {data.map((d, i) => (
             <Cell
               key={i}
-              fill={d.isFuture ? '#eef2f7' : d.pct >= 80 ? '#10b981' : d.pct >= 50 ? '#6366f1' : '#c7d2fe'}
+              fill={d.isFuture ? c.grid : d.pct >= 80 ? '#10b981' : d.pct >= 50 ? c.accent : c.accentSoft}
             />
           ))}
         </Bar>
@@ -89,18 +123,18 @@ export function CompletionBars({ data, dataKey = 'pct', labelKey = 'day' }) {
   );
 }
 
-const FALLBACK_COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#0ea5e9', '#94a3b8'];
-
 /** Category share of check-ins (donut). */
 export function CategoryDonut({ data }) {
-  const chartData = data.filter((c) => c.done > 0);
+  const c = useThemeColors();
+  const chartData = data.filter((x) => x.done > 0);
   if (!chartData.length) {
     return (
-      <div className="flex h-[220px] items-center justify-center text-sm text-slate-400">
+      <div className="flex h-[220px] items-center justify-center text-sm text-muted">
         No check-ins in this period yet.
       </div>
     );
   }
+  if (!c) return <div className="h-[220px]" />;
   return (
     <ResponsiveContainer width="100%" height={220}>
       <PieChart>
@@ -113,17 +147,20 @@ export function CategoryDonut({ data }) {
           paddingAngle={3}
           strokeWidth={0}
         >
-          {chartData.map((c, i) => (
-            <Cell key={c.name} fill={c.color || FALLBACK_COLORS[i % FALLBACK_COLORS.length]} />
+          {chartData.map((x) => (
+            <Cell key={x.name} fill={x.color || c.accent} />
           ))}
         </Pie>
-        <Tooltip contentStyle={tooltipStyle} formatter={(v, name) => [`${v} check-ins`, name]} />
+        <Tooltip
+          contentStyle={{ ...TOOLTIP_STYLE, backgroundColor: c.card, color: c.ink }}
+          formatter={(v, name) => [`${v} check-ins`, name]}
+        />
         <Legend
           verticalAlign="bottom"
           height={36}
           iconType="circle"
           iconSize={8}
-          formatter={(v) => <span style={{ fontSize: 11, color: '#64748b', fontWeight: 600 }}>{v}</span>}
+          formatter={(v) => <span style={{ fontSize: 11, color: c.tick, fontWeight: 600 }}>{v}</span>}
         />
       </PieChart>
     </ResponsiveContainer>

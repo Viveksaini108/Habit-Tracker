@@ -58,18 +58,18 @@ export default function CategoryManager({ open, onClose, categories, onChanged }
 
   return (
     <Modal open={open} onClose={onClose} title="Manage categories">
-      <p className="mb-4 text-sm text-slate-500">
+      <p className="mb-4 text-sm text-muted">
         Categories group your habits and power the analytics breakdown. Deleting one keeps the habits — they become “Uncategorized”.
       </p>
 
       <div className="space-y-2">
         {categories.length === 0 ? (
-          <p className="rounded-xl bg-slate-50 px-3 py-4 text-center text-sm text-slate-400">
+          <p className="rounded-xl bg-soft px-3 py-4 text-center text-sm text-faint">
             No categories yet — add your first below.
           </p>
         ) : (
           categories.map((c) => (
-            <div key={c.id} className="flex items-center gap-2 rounded-xl border border-slate-150 bg-slate-50/60 px-3 py-2">
+            <div key={c.id} className="flex items-center gap-2 rounded-xl border border-line bg-soft/60 px-3 py-2">
               {editing?.id === c.id ? (
                 <>
                   <input
@@ -84,7 +84,7 @@ export default function CategoryManager({ open, onClose, categories, onChanged }
                       <button
                         key={p}
                         onClick={() => setEditing((ed) => ({ ...ed, color: p }))}
-                        className={`h-5 w-5 rounded-full ${editing.color === p ? 'ring-2 ring-slate-700 ring-offset-1' : ''}`}
+                        className={`h-5 w-5 rounded-full ${editing.color === p ? 'ring-2 ring-ink2 ring-offset-1' : ''}`}
                         style={{ backgroundColor: p }}
                         aria-label={`Color ${p}`}
                       />
@@ -93,20 +93,20 @@ export default function CategoryManager({ open, onClose, categories, onChanged }
                   <button onClick={saveEdit} disabled={busy} className="rounded-lg p-1.5 text-emerald-600 hover:bg-emerald-50" aria-label="Save">
                     <IconCheck className="h-4 w-4" />
                   </button>
-                  <button onClick={() => setEditing(null)} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100" aria-label="Cancel">
+                  <button onClick={() => setEditing(null)} className="rounded-lg p-1.5 text-faint hover:bg-soft2" aria-label="Cancel">
                     <IconX className="h-4 w-4" />
                   </button>
                 </>
               ) : (
                 <>
                   <span className="h-3 w-3 rounded-full" style={{ backgroundColor: c.color }} />
-                  <span className="flex-1 truncate text-sm font-semibold text-slate-800">{c.name}</span>
-                  <span className="tnum text-xs text-slate-400">
+                  <span className="flex-1 truncate text-sm font-semibold text-ink">{c.name}</span>
+                  <span className="tnum text-xs text-faint">
                     {c.habit_count} habit{c.habit_count === 1 ? '' : 's'}
                   </span>
                   <button
                     onClick={() => setEditing({ id: c.id, name: c.name, color: c.color })}
-                    className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                    className="rounded-lg p-1.5 text-faint transition hover:bg-soft2 hover:text-ink2"
                     aria-label={`Edit ${c.name}`}
                   >
                     <IconPencil className="h-4 w-4" />
@@ -114,7 +114,7 @@ export default function CategoryManager({ open, onClose, categories, onChanged }
                   <button
                     onClick={() => remove(c)}
                     disabled={busy}
-                    className="rounded-lg p-1.5 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
+                    className="rounded-lg p-1.5 text-faint transition hover:bg-rose-50 hover:text-rose-600"
                     aria-label={`Delete ${c.name}`}
                   >
                     <IconTrash className="h-4 w-4" />
@@ -126,7 +126,7 @@ export default function CategoryManager({ open, onClose, categories, onChanged }
         )}
       </div>
 
-      <div className="mt-4 rounded-xl border border-dashed border-slate-200 p-3">
+      <div className="mt-4 rounded-xl border border-dashed border-line p-3">
         <label className="label" htmlFor="cm-new">Add category</label>
         <div className="flex gap-2">
           <input
@@ -147,7 +147,7 @@ export default function CategoryManager({ open, onClose, categories, onChanged }
             <button
               key={p}
               onClick={() => setNewColor(p)}
-              className={`h-6 w-6 rounded-full transition hover:scale-110 ${newColor === p ? 'ring-2 ring-slate-800 ring-offset-2' : ''}`}
+              className={`h-6 w-6 rounded-full transition hover:scale-110 ${newColor === p ? 'ring-2 ring-ink ring-offset-2' : ''}`}
               style={{ backgroundColor: p }}
               aria-label={`Color ${p}`}
             />

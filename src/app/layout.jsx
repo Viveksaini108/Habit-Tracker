@@ -1,4 +1,7 @@
+import '@fontsource-variable/inter';
 import './globals.css';
+import { cookies } from 'next/headers';
+import { THEME_COOKIE, THEME_IDS, DEFAULT_THEME } from '@/lib/themes';
 
 export const metadata = {
   title: {
@@ -12,12 +15,14 @@ export const metadata = {
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#4f46e5',
 };
 
 export default function RootLayout({ children }) {
+  const stored = cookies().get(THEME_COOKIE)?.value;
+  const theme = stored && THEME_IDS.has(stored) ? stored : DEFAULT_THEME;
+
   return (
-    <html lang="en">
+    <html lang="en" data-theme={theme}>
       <body className="min-h-screen font-sans">{children}</body>
     </html>
   );

@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/lib/session';
 import { dashboardData } from '@/lib/data';
 import { parseKey } from '@/lib/dates';
 import { StatCard } from '@/components/ui';
+import Mascot from '@/components/Mascot';
 import TodayCard from '@/components/TodayCard';
 import { WeekGlance, InsightsPanel, ActiveChallenges, RecentNotes } from '@/components/DashboardWidgets';
 import { IconCheck, IconTrendingUp, IconHabits, IconFlame } from '@/components/icons';
@@ -24,16 +25,19 @@ export default async function DashboardPage() {
 
   return (
     <div className="animate-fade-up">
-      <div className="mb-6">
-        <p className="text-sm font-semibold text-brand-600">{format(today, 'EEEE, MMMM d')}</p>
-        <h1 className="mt-0.5 text-2xl font-extrabold tracking-tight text-slate-900">
-          {greeting(new Date().getHours())}, {user.name.split(' ')[0]} 👋
-        </h1>
-        <p className="mt-1 text-sm text-slate-500">
+      <div className="mb-6 flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-accent">{format(today, 'EEEE, MMMM d')}</p>
+          <h1 className="mt-0.5 text-2xl font-extrabold tracking-tight text-ink">
+            {greeting(new Date().getHours())}, {user.name.split(' ')[0]} 👋
+          </h1>
+        <p className="mt-1 text-sm text-muted">
           {data.atRisk.length
             ? `${data.atRisk.length} streak${data.atRisk.length > 1 ? 's' : ''} need${data.atRisk.length > 1 ? '' : 's'} your attention today — keep the chain alive.`
             : 'Here’s your progress at a glance. One checkmark at a time.'}
         </p>
+        </div>
+        <Mascot mood="wave" size={74} className="hidden shrink-0 sm:block" />
       </div>
 
       <div className="mb-6 grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
@@ -49,7 +53,7 @@ export default async function DashboardPage() {
           label="This week"
           value={`${data.totals.weekPct}%`}
           sub="average completion"
-          accent="#6366f1"
+          accent="rgb(var(--accent))"
         />
         <StatCard
           icon={<IconHabits className="h-5 w-5" />}

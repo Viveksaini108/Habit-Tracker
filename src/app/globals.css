@@ -2,9 +2,128 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: light;
+/* ---------------------------------------------------------------------------
+   Theme tokens — switched by [data-theme] on <html>. Values are `r g b`
+   triplets so Tailwind can apply /<alpha> to any of them.
+--------------------------------------------------------------------------- */
+:root,
+[data-theme='light'] {
+  --bg: 240 243 248;
+  --card: 255 255 255;
+  --soft: 248 250 252;
+  --soft2: 241 245 249;
+  --line-soft: 241 245 249;
+  --line: 226 232 240;
+  --line-strong: 203 213 225;
+  --ink: 15 23 42;
+  --ink2: 51 65 85;
+  --muted: 100 116 139;
+  --faint: 148 163 184;
+  --accent: 99 102 241;
+  --accent-strong: 79 70 229;
+  --accent2: 139 92 246;
+  --shell: 16 18 38;
+  --shadow-clr: 16 24 40;
 }
+
+[data-theme='midnight'] {
+  color-scheme: dark;
+  --bg: 9 12 24;
+  --card: 20 24 43;
+  --soft: 26 31 53;
+  --soft2: 34 40 66;
+  --line-soft: 30 35 60;
+  --line: 45 52 84;
+  --line-strong: 62 71 110;
+  --ink: 241 245 249;
+  --ink2: 203 213 225;
+  --muted: 148 163 184;
+  --faint: 100 116 139;
+  --accent: 129 140 248;
+  --accent-strong: 165 180 252;
+  --accent2: 167 139 250;
+  --shell: 6 8 18;
+  --shadow-clr: 0 0 0;
+}
+
+[data-theme='ocean'] {
+  --bg: 234 247 249;
+  --card: 255 255 255;
+  --soft: 247 251 252;
+  --soft2: 230 243 246;
+  --line-soft: 226 240 243;
+  --line: 204 231 236;
+  --line-strong: 176 218 226;
+  --ink: 12 30 38;
+  --ink2: 34 62 74;
+  --muted: 90 116 128;
+  --faint: 133 155 165;
+  --accent: 8 145 178;
+  --accent-strong: 14 116 144;
+  --accent2: 13 148 136;
+  --shell: 8 51 68;
+  --shadow-clr: 8 51 68;
+}
+
+[data-theme='forest'] {
+  --bg: 239 247 241;
+  --card: 255 255 255;
+  --soft: 247 251 248;
+  --soft2: 233 243 236;
+  --line-soft: 229 239 232;
+  --line: 210 231 217;
+  --line-strong: 184 213 194;
+  --ink: 16 34 24;
+  --ink2: 45 74 58;
+  --muted: 94 121 105;
+  --faint: 136 158 144;
+  --accent: 5 150 105;
+  --accent-strong: 4 120 87;
+  --accent2: 101 163 13;
+  --shell: 5 46 31;
+  --shadow-clr: 20 60 40;
+}
+
+[data-theme='sunset'] {
+  color-scheme: dark;
+  --bg: 26 18 16;
+  --card: 41 29 24;
+  --soft: 50 36 30;
+  --soft2: 61 44 36;
+  --line-soft: 55 40 33;
+  --line: 84 60 48;
+  --line-strong: 110 80 64;
+  --ink: 250 244 238;
+  --ink2: 231 214 203;
+  --muted: 196 165 148;
+  --faint: 146 116 100;
+  --accent: 251 146 60;
+  --accent-strong: 253 186 116;
+  --accent2: 244 63 94;
+  --shell: 32 18 14;
+  --shadow-clr: 0 0 0;
+}
+
+[data-theme='candy'] {
+  --bg: 250 241 252;
+  --card: 255 255 255;
+  --soft: 252 247 253;
+  --soft2: 246 232 248;
+  --line-soft: 243 228 246;
+  --line: 236 213 241;
+  --line-strong: 222 190 230;
+  --ink: 42 16 48;
+  --ink2: 76 41 84;
+  --muted: 130 91 138;
+  --faint: 165 128 172;
+  --accent: 217 70 239;
+  --accent-strong: 192 38 211;
+  --accent2: 236 72 153;
+  --shell: 45 16 53;
+  --shadow-clr: 70 20 90;
+}
+
+/* -------------------------------------------------------------------------- */
 
 html {
   -webkit-font-smoothing: antialiased;
@@ -12,43 +131,193 @@ html {
 }
 
 body {
-  @apply bg-slate-100 text-slate-900;
+  @apply bg-page text-ink;
+  transition: background-color 0.25s ease, color 0.2s ease;
 }
 
 ::selection {
-  @apply bg-brand-200 text-brand-900;
+  @apply bg-accent/25 text-ink;
 }
 
-/* Slim, unobtrusive scrollbars */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgb(203 213 225) transparent;
+  scrollbar-color: rgb(var(--line-strong)) transparent;
 }
 *::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 *::-webkit-scrollbar-thumb {
-  @apply rounded-full bg-slate-300;
+  @apply rounded-full bg-line-strong;
 }
 
 @layer components {
   .card {
-    @apply rounded-2xl border border-slate-200/80 bg-white shadow-card;
+    @apply rounded-2xl border border-line/80 bg-surface shadow-card;
+    transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.2s ease, box-shadow 0.2s ease;
   }
   .input {
-    @apply w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15 disabled:cursor-not-allowed disabled:bg-slate-50;
+    @apply w-full rounded-xl border border-line-strong bg-surface px-3.5 py-2.5 text-sm text-ink placeholder-faint outline-none transition
+      focus:border-accent focus:ring-4 focus:ring-accent/20 disabled:cursor-not-allowed disabled:bg-soft;
   }
   .label {
-    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500;
+    @apply mb-1.5 block text-xs font-semibold uppercase tracking-wide text-muted;
   }
   .tnum {
     font-variant-numeric: tabular-nums;
   }
 }
 
-/* Hide number/date spinners that clash with the design */
+/* Shine sweep for primary buttons */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shine::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -90%;
+  height: 100%;
+  width: 45%;
+  transform: skewX(-20deg);
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  pointer-events: none;
+}
+.btn-shine:hover::after {
+  animation: hf-shine 0.8s ease;
+}
+@keyframes hf-shine {
+  to {
+    left: 135%;
+  }
+}
+
+/* Shimmer loading skeleton */
+.skeleton {
+  @apply rounded-xl bg-soft2;
+  position: relative;
+  overflow: hidden;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgb(var(--card) / 0.7), transparent);
+  animation: hf-shimmer 1.4s infinite;
+}
+@keyframes hf-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Checkbox "draw" animation */
+.check-path {
+  stroke-dasharray: 22;
+  stroke-dashoffset: 22;
+  transition: stroke-dashoffset 0.25s ease 0.05s;
+}
+.is-checked .check-path {
+  stroke-dashoffset: 0;
+}
+
+/* Mascot animations */
+.mascot {
+  transform-origin: center bottom;
+  animation: hf-bob 3.6s ease-in-out infinite;
+}
+.mascot-eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hf-blink 4.8s ease-in-out infinite;
+}
+.mascot-arm-wave {
+  transform-box: fill-box;
+  transform-origin: 50% 90%;
+  animation: hf-wave 1.6s ease-in-out infinite;
+}
+.mascot-leaf {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: hf-sway 3s ease-in-out infinite;
+}
+@keyframes hf-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+@keyframes hf-blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.08);
+  }
+}
+@keyframes hf-wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-22deg);
+  }
+}
+@keyframes hf-sway {
+  0%,
+  100% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+}
+
+/* Confetti burst (rendered by ConfettiBurst) */
+.hf-confetti {
+  position: absolute;
+  top: -8px;
+  border-radius: 2px;
+  opacity: 0;
+  animation: hf-confetti 1.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes hf-confetti {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--drift, 0px), 180px, 0) rotate(var(--spin, 540deg));
+  }
+}
+
 input[type='date']::-webkit-calendar-picker-indicator,
 input[type='month']::-webkit-calendar-picker-indicator {
   @apply cursor-pointer opacity-60 transition hover:opacity-100;
+}
+[data-theme='midnight'] input[type='date']::-webkit-calendar-picker-indicator,
+[data-theme='midnight'] input[type='month']::-webkit-calendar-picker-indicator,
+[data-theme='sunset'] input[type='date']::-webkit-calendar-picker-indicator,
+[data-theme='sunset'] input[type='month']::-webkit-calendar-picker-indicator {
+  filter: invert(0.8);
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

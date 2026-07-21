@@ -137,7 +137,7 @@ export default function HabitForm({ open, onClose, onSaved, habit, categories, t
 
         <div>
           <label className="label" htmlFor="hf-desc">
-            Description <span className="font-normal normal-case text-slate-400">(optional)</span>
+            Description <span className="font-normal normal-case text-faint">(optional)</span>
           </label>
           <textarea
             id="hf-desc"
@@ -177,20 +177,20 @@ export default function HabitForm({ open, onClose, onSaved, habit, categories, t
                   onClick={() => patch({ target_per_week: n })}
                   className={`tnum h-9 flex-1 rounded-lg text-sm font-bold transition ${
                     form.target_per_week === n
-                      ? 'bg-brand-600 text-white shadow-sm'
-                      : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                      ? 'bg-accent text-white shadow-sm'
+                      : 'bg-soft2 text-muted hover:bg-soft2'
                   }`}
                 >
                   {n}
                 </button>
               ))}
             </div>
-            <p className="mt-1 text-[11px] text-slate-400">times per week</p>
+            <p className="mt-1 text-[11px] text-faint">times per week</p>
           </div>
         </div>
 
         {form.category_id === '__new__' ? (
-          <div className="animate-fade-up rounded-xl border border-brand-100 bg-brand-50/60 p-3">
+          <div className="animate-fade-up rounded-xl border border-accent/20 bg-accent/10 p-3">
             <label className="label" htmlFor="hf-newcat">New category name</label>
             <div className="flex items-center gap-2">
               <input
@@ -209,7 +209,7 @@ export default function HabitForm({ open, onClose, onSaved, habit, categories, t
                   type="button"
                   aria-label={`Category color ${c}`}
                   onClick={() => setNewCat((nc) => ({ name: '', ...nc, color: c }))}
-                  className={`h-6 w-6 rounded-full transition ${newCat?.color === c ? 'ring-2 ring-slate-800 ring-offset-2' : ''}`}
+                  className={`h-6 w-6 rounded-full transition ${newCat?.color === c ? 'ring-2 ring-ink ring-offset-2' : ''}`}
                   style={{ backgroundColor: c }}
                 />
               ))}
@@ -226,7 +226,7 @@ export default function HabitForm({ open, onClose, onSaved, habit, categories, t
                 type="button"
                 aria-label={`Color ${c}`}
                 onClick={() => patch({ color: c })}
-                className={`h-8 w-8 rounded-full transition hover:scale-110 ${form.color === c ? 'ring-2 ring-slate-800 ring-offset-2' : ''}`}
+                className={`h-8 w-8 rounded-full transition hover:scale-110 ${form.color === c ? 'ring-2 ring-ink ring-offset-2' : ''}`}
                 style={{ backgroundColor: c }}
               />
             ))}
@@ -247,7 +247,7 @@ export default function HabitForm({ open, onClose, onSaved, habit, categories, t
           </div>
           <div>
             <label className="label" htmlFor="hf-end">
-              End date <span className="font-normal normal-case text-slate-400">(optional)</span>
+              End date <span className="font-normal normal-case text-faint">(optional)</span>
             </label>
             <input
               id="hf-end"
