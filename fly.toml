@@ -1,0 +1,34 @@
+# Fly.io deployment for HabitFlow (uses the repo's Dockerfile).
+#
+#   fly auth login
+#   fly apps create habitflow-<your-suffix>     # names are globally unique
+#   fly volumes create habitflow_data --size 1 --region bom
+#   fly secrets set SESSION_SECRET="$(openssl rand -base64 48)"
+#   fly deploy --ha=false
+#
+# Then build the APK with  https://<your-app>.fly.dev  as the server URL.
+
+app = "habitflow"          # ← change to the unique name you created above
+primary_region = "bom"     # Mumbai — closest to you; change any time
+
+[build]                    # Dockerfile is used automatically
+
+[env]
+  PORT = "3000"
+  HOSTNAME = "0.0.0.0"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = "stop"   # sleeps when idle (saves allowance)…
+  auto_start_machines = true    # …and wakes on the first request (~5–10 s)
+  min_machines_running = 0      # set to 1 to never cold-start
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
+
+# Persistent SQLite storage — this is what keeps your habits safe.
+[mounts]
+  source = "habitflow_data"
+  destination = "/app/data"

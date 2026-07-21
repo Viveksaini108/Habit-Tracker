@@ -47,8 +47,11 @@ Edit `mobile/capacitor.config.json`:
   ```
 
   Verify from the phone's browser first: `http://<PC-IP>:3000` should load the login page.
-- **Production:** deploy the app (Railway / Render / a VPS…) and set
-  `"url": "https://your-domain.com"` — `cleartext` can be removed for https.
+- **Production:** deploy the app — the repo's **`Dockerfile`** works on Render,
+  Fly.io (`fly.toml` included), Oracle's free VM, or any container host
+  (see the README's *Deploying* section) — and set
+  `"url": "https://your-domain.com"` (`cleartext` can be removed for https).
+  An https URL also unlocks the **full offline mode** in the app (§6).
 
 Then sync once:
 

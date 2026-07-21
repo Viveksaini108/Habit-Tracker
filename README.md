@@ -43,6 +43,30 @@ npm start          # serve the production build
 npm run seed       # wipe & re-seed the demo data
 ```
 
+## Deploying (get a public https URL → then the "forever APK")
+
+HabitFlow ships a production **`Dockerfile`** (multi-stage, standalone Next.js
+output, non-root, health-checked). Any Docker-capable host can run it — and your
+data survives as long as the `/app/data` volume persists.
+
+```bash
+# try it locally
+docker build -t habitflow .
+docker run -p 3000:3000 -e SESSION_SECRET="a-long-random-string" \
+  -v habitflow-data:/app/data habitflow        # → http://localhost:3000
+```
+
+| Host | How |
+| --- | --- |
+| **Render** (free tier) | New → Web Service → it **auto-detects the Dockerfile** (or use Node runtime: build `npm install && npm run build`, start `npm start -- -H 0.0.0.0 -p $PORT`). Free tier sleeps when idle and has **no persistent disk** — fine for demos; the app auto-reseeds on restart. |
+| **Fly.io** (~free allowances) | `fly.toml` is ready: create app & volume, `fly secrets set SESSION_SECRET=…`, `fly deploy --ha=false`. Persistent volume included. |
+| **Oracle Cloud "Always Free" VM** | Free forever: install Docker on the VM, then the two `docker` commands above (put Caddy/nginx + a free DuckDNS name in front for https). |
+
+Everywhere: set **`SESSION_SECRET`** (32+ random chars) and keep **`/app/data`**
+on a persistent volume. Once deployed, build the mobile apps against that
+`https://…` URL (see [MOBILE.md](MOBILE.md#2-point-the-app-at-your-server)) —
+https also unlocks the full offline mode.
+
 ## Architecture
 
 ```
