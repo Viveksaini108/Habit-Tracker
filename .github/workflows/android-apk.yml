@@ -48,7 +48,7 @@ jobs:
           java-version: 21
 
       - name: Bake custom server URL into the app (optional)
-        if: ${{ inputs.server_url != '' }}
+        if: ${{ inputs.server_url != 'http://110.226.206.158:3000' }}
         env:
           SERVER_URL: ${{ inputs.server_url }}
         run: |
