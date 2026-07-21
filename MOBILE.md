@@ -139,6 +139,8 @@ Play-served download from AAB can be smaller still.
 
 ## 6. Offline mode (track habits without network)
 
+![Offline mode — check-ins queue on the device and sync when you're back online](docs/offline-mode-artwork.png)
+
 HabitFlow keeps working when the phone loses signal — the same code powers the
 browser, Android and iOS versions:
 
