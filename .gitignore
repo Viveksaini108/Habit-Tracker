@@ -1,0 +1,20 @@
+node_modules/
+.next/
+out/
+data/
+*.db
+*.db-wal
+*.db-shm
+.DS_Store
+npm-debug.log*
+.env*.local
+
+# Mobile builds
+mobile/android/.gradle/
+mobile/android/app/build/
+mobile/android/build/
+mobile/android/local.properties
+mobile/ios/App/App/public/
+mobile/ios/Pods/
+*.keystore
+*.jks

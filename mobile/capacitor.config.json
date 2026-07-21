@@ -1,0 +1,16 @@
+{
+  "appId": "app.habitflow.mobile",
+  "appName": "HabitFlow",
+  "webDir": "www",
+  "server": {
+    "url": "http://192.168.1.10:3000",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true
+  },
+  "ios": {
+    "contentInset": "automatic"
+  },
+  "backgroundColor": "#101226"
+}

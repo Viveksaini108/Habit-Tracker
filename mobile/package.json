@@ -1,0 +1,19 @@
+{
+  "name": "habitflow-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HabitFlow native shell (Android & iOS) via Capacitor",
+  "scripts": {
+    "sync": "npx cap sync",
+    "open:android": "npx cap open android",
+    "open:ios": "npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.6.8",
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/ios": "^7.6.8"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3"
+  }
+}

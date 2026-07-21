@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>HabitFlow</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #101226;
+        color: #e2e8f0;
+        font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+      }
+      .card {
+        max-width: 420px;
+        margin: 24px;
+        padding: 28px;
+        text-align: center;
+        background: #171a33;
+        border-radius: 20px;
+        border: 1px solid #2d3154;
+      }
+      .logo {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        font-size: 32px;
+        margin-bottom: 16px;
+      }
+      h1 { font-size: 20px; margin: 0 0 8px; }
+      p { font-size: 14px; line-height: 1.6; color: #94a3b8; margin: 0; }
+      code {
+        background: #0d0f24;
+        padding: 2px 8px;
+        border-radius: 6px;
+        color: #a5b4fc;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="logo">✓</div>
+      <h1>HabitFlow can't reach the server</h1>
+      <p>
+        This app is a native shell around the HabitFlow web app. Start the server on your PC with
+        <code>npm run dev -- -H 0.0.0.0</code> (or deploy it), then point <code>mobile/capacitor.config.json → server.url</code>
+        at that address and run <code>npx cap sync</code>.
+      </p>
+    </div>
+  </body>
+</html>
