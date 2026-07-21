@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import { Button, EmptyState, Modal, StarRating } from './ui';
 import { IconTrash, IconCheck, IconChevronDown, IconJournal } from './icons';
@@ -37,18 +37,24 @@ function ReflectionCard({ reflection, onEdit, onDelete }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="card p-4">
-      <button onClick={() => setOpen((v) => !v)} className="flex w-full items-center justify-between gap-3 text-left">
-        <div>
+      <div className="flex w-full items-center justify-between gap-3">
+        <button onClick={() => setOpen((v) => !v)} className="min-w-0 flex-1 text-left" aria-expanded={open}>
           <p className="text-sm font-bold text-slate-900">{reflection.label}</p>
           <p className="mt-0.5 text-xs text-slate-400">
             Updated {reflection.updated_at?.slice(0, 10)}
           </p>
-        </div>
+        </button>
         <div className="flex items-center gap-3">
           <StarRating value={reflection.rating} readOnly />
-          <IconChevronDown className={`h-4 w-4 text-slate-400 transition ${open ? 'rotate-180' : ''}`} />
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            aria-label={open ? 'Collapse' : 'Expand'}
+          >
+            <IconChevronDown className={`h-4 w-4 transition ${open ? 'rotate-180' : ''}`} />
+          </button>
         </div>
-      </button>
+      </div>
       {open ? (
         <div className="mt-4 space-y-3 border-t border-slate-100 pt-4">
           {FIELDS.map((f) =>
@@ -79,7 +85,6 @@ export default function ReflectionsClient({ initialReflections, currentMonth }) 
   );
   const [month, setMonth] = useState(currentMonth);
   const [draft, setDraft] = useState(EMPTY);
-  const [loadedMonth, setLoadedMonth] = useState('');
   const [saving, setSaving] = useState(false);
   const [savedTick, setSavedTick] = useState(false);
   const [deleting, setDeleting] = useState(null);
@@ -93,7 +98,6 @@ export default function ReflectionsClient({ initialReflections, currentMonth }) 
     if (byMonth.has(m)) {
       const r = byMonth.get(m);
       setDraft({ highlights: r.highlights, challenges: r.challenges, learnings: r.learnings, next_focus: r.next_focus, rating: r.rating });
-      setLoadedMonth(m);
       return;
     }
     // Try the server (handles edge cases) then fall back to a blank form.
@@ -109,13 +113,17 @@ export default function ReflectionsClient({ initialReflections, currentMonth }) 
     } catch {
       setDraft(EMPTY);
     }
-    setLoadedMonth(m);
   };
 
-  // Initial load
-  if (loadedMonth === '') {
+  // Initial load — must run in an effect: calling setState during render
+  // loops on exact re-mounts (React error #301).
+  const initialLoaded = useRef(false);
+  useEffect(() => {
+    if (initialLoaded.current) return;
+    initialLoaded.current = true;
     loadMonth(currentMonth);
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const patch = (p) => setDraft((d) => ({ ...d, ...p }));
 
