@@ -41,6 +41,14 @@ jobs:
         with:
           node-version: 22
 
+      # Capacitor 7's capacitor-android compiles with Java 21; the runner's
+      # default JDK is 17 and fails with "invalid source release: 21".
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
       - name: Bake custom server URL into the app (optional)
         if: ${{ inputs.server_url != '' }}
         env:
