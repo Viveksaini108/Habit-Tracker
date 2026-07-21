@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -17,6 +17,8 @@ import {
 } from './icons';
 import ThemePicker from './ThemePicker';
 import Mascot from './Mascot';
+import OfflineSyncBar from './OfflineSyncBar';
+import { clearOfflineCaches } from '@/lib/offline';
 
 const NAV = [
   { href: '/dashboard', label: 'Dashboard', icon: IconDashboard },
@@ -92,10 +94,21 @@ export default function AppShell({ user, theme, children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
 
+  // After an offline outbox flush, pull the server's reconciled truth
+  // (streaks, totals) back into the server-rendered pages.
+  useEffect(() => {
+    const onSynced = () => router.refresh();
+    window.addEventListener('hf-synced', onSynced);
+    return () => window.removeEventListener('hf-synced', onSynced);
+  }, [router]);
+
   const logout = async () => {
     setLoggingOut(true);
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
+      // Cached pages hold user data — drop them; queued check-ins are flushed
+      // first, and anything unsent stays queued for the next sign-in.
+      clearOfflineCaches();
       router.push('/login');
       router.refresh();
     } finally {
@@ -153,7 +166,10 @@ export default function AppShell({ user, theme, children }) {
         </div>
       ) : null}
 
-      <main className="safe-bottom mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">{children}</main>
+      <main className="safe-bottom mx-auto w-full max-w-6xl px-4 pb-24 pt-6 sm:px-6 lg:px-8 lg:pt-8 lg:pb-20">{children}</main>
+
+      {/* Offline mode status pill (offline / syncing / synced) */}
+      <OfflineSyncBar />
     </div>
   );
 }

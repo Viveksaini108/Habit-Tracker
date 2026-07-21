@@ -68,6 +68,25 @@ is the full HabitFlow experience — sign in with the demo account and everythin
 
 ### Build an APK to share / install
 
+#### Option A — in the cloud (easiest, no Android Studio needed)
+
+This repo ships a GitHub Actions workflow (`.github/workflows/android-apk.yml`)
+that builds an **installable APK for you** and attaches it to the run:
+
+1. Push your changes (any change under `mobile/` triggers a build automatically),
+   or go to **Actions → Build Android APK → Run workflow**.
+2. *(Optional)* On manual runs, type your **server URL**
+   (e.g. `http://192.168.1.25:3000` — your PC's LAN IP, or your hosted https URL)
+   and it gets baked into the app for you.
+3. When the run turns green (~5 min), download **`habitflow-debug-apk`** from the
+   run's *Artifacts* section, unzip, and copy `habitflow-debug.apk` to your phone
+   (USB / WhatsApp / Drive / email).
+4. On the phone: tap the APK → allow *"Install unknown apps"* for your browser/files
+   app → **Install**. Debug APKs are signed with the standard debug key, so they
+   install on any Android device without a Play account.
+
+#### Option B — locally with Gradle / Android Studio
+
 From Android Studio: **Build → Build Bundle(s)/APK(s) → Build APK(s)** (debug).
 For the small **release** build:
 
@@ -113,7 +132,36 @@ npx cap open ios        # opens Xcode
 Reference numbers (typical): debug APK ≈ 8–10 MB, release APK ≈ 5–7 MB,
 Play-served download from AAB can be smaller still.
 
-## 6. Regenerating icons & splash
+## 6. Offline mode (track habits without network)
+
+HabitFlow keeps working when the phone loses signal — the same code powers the
+browser, Android and iOS versions:
+
+- **App opens offline.** A service worker (`public/sw.js`) caches the app shell,
+  static assets and pages you've visited, so the app still loads with no network
+  (and shows a branded Bloop page for screens never opened before).
+- **Check-ins queue on the device.** Toggling a habit while offline writes the
+  *absolute state* (`{ habit, date, completed }`) to a small on-device outbox
+  (`localStorage`). The row gets an amber **"queued"** badge, and today's
+  checklist still feels instant.
+- **Auto-sync to the online database.** The moment connectivity returns, the
+  outbox replays to the server in order (`src/lib/offline.js → flushQueue`),
+  the floating pill flashes **"All changes synced"**, and streaks/totals
+  reconcile from the server — which always stays the source of truth.
+- Replay is **idempotent**: the entries API is an upsert by `(habit, date)`, so
+  retried syncs can't double-apply or fight with edits made on other devices.
+- Cached pages are wiped on sign-out; anything still queued is kept so it can
+  sync on the next sign-in rather than being lost.
+
+**Honest limits of v1**
+
+| Limit | Why |
+| --- | --- |
+| Full offline-open needs **https** (or localhost) | Service workers require a *secure context*. Over plain `http://LAN-IP`, queueing still works on pages already loaded, but a cold app start offline won't. Deploy with https (or test on localhost) for the full experience. |
+| Offline writes = **check-ins only** | Habit creation/edits, notes, reflections and challenge actions still need the server (roadmap: extend the outbox to them). |
+| Analytics shown offline are as-of last visit | Cached pages are snapshots; they refresh once you're back online. |
+
+## 7. Regenerating icons & splash
 
 Crisp icons/splash are generated programmatically (no designer needed):
 
@@ -122,7 +170,7 @@ pip install pillow
 python3 scripts/generate-mobile-assets.py   # from the repo root
 ```
 
-## 7. Notes & limitations
+## 8. Notes & limitations
 
 - **Branching:** this work landed on `arena/019f82ef-habit-tracker`. To isolate it
   into your own branch: `git checkout -b mobile-app && git push -u origin mobile-app`.

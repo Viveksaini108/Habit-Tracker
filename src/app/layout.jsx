@@ -2,6 +2,7 @@ import '@fontsource-variable/inter';
 import './globals.css';
 import { cookies } from 'next/headers';
 import { THEME_COOKIE, THEME_IDS, DEFAULT_THEME } from '@/lib/themes';
+import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
 
 export const metadata = {
   title: {
@@ -31,7 +32,10 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en" data-theme={theme}>
-      <body className="min-h-screen font-sans">{children}</body>
+      <body className="min-h-screen font-sans">
+        {children}
+        <ServiceWorkerRegister />
+      </body>
     </html>
   );
 }

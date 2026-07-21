@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>HabitFlow</title>
     <style>
+      :root { color-scheme: dark; }
       body {
         margin: 0;
         min-height: 100vh;
@@ -13,48 +14,141 @@
         justify-content: center;
         background: #101226;
         color: #e2e8f0;
+        padding: 24px;
         font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
       }
       .card {
-        max-width: 420px;
-        margin: 24px;
-        padding: 28px;
+        max-width: 440px;
+        width: 100%;
+        padding: 30px 26px;
         text-align: center;
         background: #171a33;
-        border-radius: 20px;
+        border-radius: 22px;
         border: 1px solid #2d3154;
+        box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.6);
       }
-      .logo {
-        width: 64px;
-        height: 64px;
-        border-radius: 18px;
+      h1 { font-size: 19px; margin: 14px 0 6px; }
+      .sub { font-size: 13px; line-height: 1.55; color: #94a3b8; margin: 0 0 18px; }
+      .steps { text-align: left; margin: 0 0 18px; padding: 0; list-style: none; counter-reset: step; }
+      .steps li {
+        counter-increment: step;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        font-size: 13px;
+        line-height: 1.5;
+        color: #c7cbee;
+        padding: 8px 0;
+        border-top: 1px solid #23264a;
+      }
+      .steps li::before {
+        content: counter(step);
+        flex: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 800;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, #6366f1, #8b5cf6);
-        font-size: 32px;
-        margin-bottom: 16px;
+        margin-top: 1px;
       }
-      h1 { font-size: 20px; margin: 0 0 8px; }
-      p { font-size: 14px; line-height: 1.6; color: #94a3b8; margin: 0; }
       code {
         background: #0d0f24;
-        padding: 2px 8px;
+        padding: 1px 7px;
         border-radius: 6px;
         color: #a5b4fc;
-        font-size: 13px;
+        font-size: 12px;
+        word-break: break-all;
       }
+      .actions { display: flex; gap: 10px; justify-content: center; align-items: center; }
+      button {
+        border: 0;
+        border-radius: 12px;
+        padding: 11px 20px;
+        cursor: pointer;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        color: #fff;
+        font-weight: 700;
+        font-size: 14px;
+        box-shadow: 0 6px 20px -6px rgba(124, 92, 246, 0.7);
+      }
+      button:active { transform: scale(0.97); }
+      .hint { font-size: 11px; color: #64748b; margin-top: 12px; }
+      .mascot { animation: bob 3.2s ease-in-out infinite; }
+      .zzz { animation: floatZ 2.6s ease-in-out infinite; opacity: 0; }
+      .zzz.z2 { animation-delay: 1.3s; }
+      @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+      @keyframes floatZ {
+        0% { transform: translate(0, 0); opacity: 0; }
+        25% { opacity: 0.9; }
+        100% { transform: translate(7px, -13px); opacity: 0; }
+      }
+      @media (prefers-reduced-motion: reduce) { .mascot, .zzz { animation: none; opacity: 1; } }
     </style>
   </head>
   <body>
-    <div class="card">
-      <div class="logo">✓</div>
-      <h1>HabitFlow can't reach the server</h1>
-      <p>
-        This app is a native shell around the HabitFlow web app. Start the server on your PC with
-        <code>npm run dev -- -H 0.0.0.0</code> (or deploy it), then point <code>mobile/capacitor.config.json → server.url</code>
-        at that address and run <code>npx cap sync</code>.
+    <main class="card">
+      <!-- Bloop, the HabitFlow mascot — asleep while it waits for the server -->
+      <svg class="mascot" width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="Bloop, the HabitFlow mascot, sleeping">
+        <defs>
+          <linearGradient id="bloop-body" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" style="stop-color: #6366f1" />
+            <stop offset="100%" style="stop-color: #8b5cf6" />
+          </linearGradient>
+        </defs>
+        <g>
+          <path d="M60 22 C 55 8, 42 6, 38 12 C 44 14, 48 20, 50 24 Z" fill="#34d399" />
+          <path d="M60 22 C 64 6, 78 4, 82 10 C 76 13, 71 19, 69 23 Z" fill="#10b981" />
+        </g>
+        <ellipse cx="22" cy="74" rx="9" ry="12" fill="url(#bloop-body)" opacity="0.85" />
+        <path d="M60 24 C 86 24, 99 42, 99 64 C 99 89, 82 106, 60 106 C 38 106, 21 89, 21 64 C 21 42, 34 24, 60 24 Z" fill="url(#bloop-body)" />
+        <ellipse cx="60" cy="82" rx="24" ry="16" fill="#fff" opacity="0.18" />
+        <g stroke="#1e293b" stroke-width="3" stroke-linecap="round" fill="none">
+          <path d="M42 62 q 6 5 12 0" />
+          <path d="M66 62 q 6 5 12 0" />
+        </g>
+        <ellipse cx="40" cy="71" rx="5" ry="3.4" fill="#fda4af" opacity="0.75" />
+        <ellipse cx="80" cy="71" rx="5" ry="3.4" fill="#fda4af" opacity="0.75" />
+        <ellipse cx="60" cy="76" rx="4.5" ry="5" fill="#1e293b" />
+        <g fill="#64748b" font-weight="800" font-family="ui-sans-serif, system-ui, sans-serif">
+          <text class="zzz" x="96" y="34" font-size="12">z</text>
+          <text class="zzz z2" x="104" y="22" font-size="15">z</text>
+        </g>
+      </svg>
+
+      <h1>Bloop is waiting for the HabitFlow server</h1>
+      <p class="sub">
+        This app is a native shell around the HabitFlow web app &mdash; it wakes up as soon as it can
+        reach your server. To get going:
       </p>
-    </div>
+      <ol class="steps">
+        <li>On your PC, start HabitFlow with <code>npm run dev -- -H 0.0.0.0</code> (or deploy it &mdash; see MOBILE.md).</li>
+        <li>Point <code>mobile/capacitor.config.json &rarr; server.url</code> at that address, e.g. <code>http://YOUR-PC-IP:3000</code>.</li>
+        <li>Run <code>npx cap sync</code> and rebuild the app &mdash; or just tap retry if it&rsquo;s already set up.</li>
+      </ol>
+      <div class="actions">
+        <button type="button" onclick="retryNow()">Retry now</button>
+      </div>
+      <p class="hint" id="hint">Auto-retrying every 8 seconds&hellip;</p>
+    </main>
+
+    <script>
+      // Keep in sync with capacitor.config.json → server.url
+      // (the CI APK builder rewrites both when you pass a custom server URL).
+      var SERVER_URL = 'http://192.168.1.10:3000';
+
+      function retryNow() {
+        var hint = document.getElementById('hint');
+        hint.textContent = 'Checking for the server…';
+        fetch(SERVER_URL, { mode: 'no-cors', cache: 'no-store' })
+          .then(function () { window.location.assign(SERVER_URL); })
+          .catch(function () { hint.textContent = 'Still can’t reach it — is the server running?'; });
+      }
+      setInterval(retryNow, 8000);
+    </script>
   </body>
 </html>

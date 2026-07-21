@@ -1,10 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Badge, EmptyState, Spinner } from './ui';
-import { IconFlame, IconPlus } from './icons';
+import { IconClock, IconFlame, IconPlus } from './icons';
 import ConfettiBurst from './ConfettiBurst';
+import { submitEntry, queuedForDate, subscribe } from '@/lib/offline';
 
 function CheckDraw({ checked }) {
   return (
@@ -14,14 +15,32 @@ function CheckDraw({ checked }) {
   );
 }
 
+/** Overlay queued (not-yet-synced) check-ins onto the server snapshot. */
+function withQueued(list, today) {
+  const queued = queuedForDate(today);
+  if (!queued.length) return list;
+  const latest = new Map(); // habitId → completed (FIFO → last write wins)
+  for (const op of queued) latest.set(op.habitId, op.completed);
+  return list.map((h) => (latest.has(h.id) ? { ...h, done: latest.get(h.id), queued: true } : h));
+}
+
 /**
- * Today's habit checklist with optimistic toggles.
+ * Today's habit checklist with optimistic toggles + offline queueing.
  * Props: initialList (habit + done + streak), today
  */
 export default function TodayChecklist({ initialList, today, onNewHabit }) {
-  const [items, setItems] = useState(initialList);
+  const [items, setItems] = useState(() => withQueued(initialList, today));
   const [pending, setPending] = useState(new Set());
   const [error, setError] = useState('');
+
+  // Fresh server snapshot (e.g. after an outbox flush → router.refresh):
+  // adopt it, re-applying anything still queued on this device.
+  useEffect(() => {
+    setItems(withQueued(initialList, today));
+  }, [initialList, today]);
+
+  // Keep the overlay in step with outbox changes (flushes, other tabs).
+  useEffect(() => subscribe(() => setItems((list) => withQueued(list, today))), [today]);
 
   const groups = useMemo(() => {
     const map = new Map();
@@ -48,17 +67,18 @@ export default function TodayChecklist({ initialList, today, onNewHabit }) {
     );
     setPending((s) => new Set(s).add(habit.id));
     try {
-      const res = await fetch(`/api/habits/${habit.id}/entries`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: today, completed: next }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.error || 'Failed');
-      // Reconcile streak with server truth
-      setItems((list) => list.map((h) => (h.id === habit.id ? { ...h, streak: data.streak } : h)));
+      const res = await submitEntry({ habitId: habit.id, date: today, completed: next });
+      if (res.status === 'synced') {
+        // Reconcile streak with server truth
+        setItems((list) => list.map((h) => (h.id === habit.id ? { ...h, streak: res.streak } : h)));
+      } else if (res.status === 'queued') {
+        // Offline: the check-in is saved on this device and will sync itself
+        setItems((list) => list.map((h) => (h.id === habit.id ? { ...h, queued: true } : h)));
+      } else {
+        throw new Error(res.error);
+      }
     } catch (e) {
-      // Rollback
+      // Server rejected → rollback
       setItems((list) =>
         list.map((h) =>
           h.id === habit.id
@@ -66,7 +86,7 @@ export default function TodayChecklist({ initialList, today, onNewHabit }) {
             : h
         )
       );
-      setError(e.message === 'Failed' ? 'Could not save your check-in. Please try again.' : e.message);
+      setError(e.message || 'Could not save your check-in. Please try again.');
     } finally {
       setPending((s) => {
         const copy = new Set(s);
@@ -159,6 +179,17 @@ export default function TodayChecklist({ initialList, today, onNewHabit }) {
                         <p className="text-[11px] text-faint">{h.target_per_week}× per week</p>
                       ) : null}
                     </Link>
+
+                    {h.queued ? (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold"
+                        style={{ backgroundColor: '#fff7e6', color: '#d97706' }}
+                        title="Saved on this device — syncs automatically when you're back online"
+                      >
+                        <IconClock className="h-3 w-3" />
+                        queued
+                      </span>
+                    ) : null}
 
                     {h.streak > 0 ? (
                       <span

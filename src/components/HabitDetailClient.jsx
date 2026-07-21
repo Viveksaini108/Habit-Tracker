@@ -1,13 +1,14 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { parseISO, startOfWeek, addDays, format } from 'date-fns';
 import HabitForm from './HabitForm';
 import { Badge, Button, Modal, ProgressBar, Spinner } from './ui';
 import {
-  IconCheck, IconFlame, IconPencil, IconTrash, IconArchive, IconRefresh, IconCalendar, IconTarget,
+  IconCheck, IconClock, IconFlame, IconPencil, IconTrash, IconArchive, IconRefresh, IconCalendar, IconTarget,
 } from './icons';
+import { submitEntry, queuedForHabit, subscribe } from '@/lib/offline';
 
 const toKey = (d) => format(d, 'yyyy-MM-dd');
 const inWindow = (h, key) => h.start_date <= key && (!h.end_date || key <= h.end_date);
@@ -67,13 +68,37 @@ export function HabitHeatmap({ habit, entries, today }) {
 }
 
 /* ------------------------------ quick check range ----------------------------- */
+/** Server snapshot overlaid with this device's queued (unsynced) check-ins. */
+function overlayQueued(base, habitId) {
+  const set = new Set(base);
+  const queued = new Set();
+  for (const op of queuedForHabit(habitId)) {
+    if (op.completed) set.add(op.date);
+    else set.delete(op.date);
+    queued.add(op.date);
+  }
+  return { set, queued };
+}
+
 function QuickCheck({ habit, initialEntries, today }) {
-  const [entrySet, setEntrySet] = useState(() => new Set(initialEntries));
+  const [entrySet, setEntrySet] = useState(() => overlayQueued(initialEntries, habit.id).set);
+  const [queuedKeys, setQueuedKeys] = useState(() => overlayQueued(initialEntries, habit.id).queued);
   const [pending, setPending] = useState('');
   const days = useMemo(
     () => Array.from({ length: 14 }, (_, i) => toKey(addDays(parseISO(today), -(13 - i)))),
     [today]
   );
+
+  // Adopt fresh server snapshots while keeping unsynced device check-ins visible.
+  useEffect(() => {
+    const recalc = () => {
+      const { set, queued } = overlayQueued(initialEntries, habit.id);
+      setEntrySet(set);
+      setQueuedKeys(queued);
+    };
+    recalc();
+    return subscribe(recalc);
+  }, [initialEntries, habit.id]);
 
   const toggle = async (key) => {
     const next = !entrySet.has(key);
@@ -85,13 +110,13 @@ function QuickCheck({ habit, initialEntries, today }) {
       return copy;
     });
     try {
-      const res = await fetch(`/api/habits/${habit.id}/entries`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: key, completed: next }),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.error);
+      const res = await submitEntry({ habitId: habit.id, date: key, completed: next });
+      if (res.status === 'queued') {
+        // Offline: kept on-device until the outbox syncs
+        setQueuedKeys((s) => new Set(s).add(key));
+      } else if (res.status === 'error') {
+        throw new Error(res.error);
+      }
     } catch {
       setEntrySet((s) => {
         const copy = new Set(s);
@@ -128,7 +153,13 @@ function QuickCheck({ habit, initialEntries, today }) {
             <span className="text-[9px] font-bold uppercase">{format(parseISO(key), 'EEE')}</span>
             <span className="tnum text-xs font-extrabold">{Number(key.slice(8, 10))}</span>
             <span className="flex h-3.5 w-3.5 items-center justify-center">
-              {pending === key ? <Spinner className="h-3 w-3" /> : done ? <IconCheck className="h-3.5 w-3.5" /> : null}
+              {pending === key ? (
+                <Spinner className="h-3 w-3" />
+              ) : done && queuedKeys.has(key) ? (
+                <IconClock className="h-3 w-3" aria-label="Saved on this device — will sync" />
+              ) : done ? (
+                <IconCheck className="h-3.5 w-3.5" />
+              ) : null}
             </span>
           </button>
         );
