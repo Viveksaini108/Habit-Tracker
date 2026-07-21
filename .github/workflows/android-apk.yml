@@ -48,7 +48,7 @@ jobs:
           java-version: 21
 
       - name: Bake custom server URL into the app (optional)
-        if: ${{ inputs.server_url != 'http://192.168.1.25:3000' }}
+        if: ${{ inputs.server_url != 'https://habit-tracker-1-6o5t.onrender.com' }}
         env:
           SERVER_URL: ${{ inputs.server_url }}
         run: |
