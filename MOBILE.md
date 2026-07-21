@@ -70,20 +70,25 @@ is the full HabitFlow experience — sign in with the demo account and everythin
 
 #### Option A — in the cloud (easiest, no Android Studio needed)
 
-This repo ships a GitHub Actions workflow (`.github/workflows/android-apk.yml`)
-that builds an **installable APK for you** and attaches it to the run:
+The repo ships a ready-made GitHub Actions builder — it just needs a **one-step
+activation** (workflow files can only be added by the repo owner):
 
-1. Push your changes (any change under `mobile/` triggers a build automatically),
-   or go to **Actions → Build Android APK → Run workflow**.
-2. *(Optional)* On manual runs, type your **server URL**
-   (e.g. `http://192.168.1.25:3000` — your PC's LAN IP, or your hosted https URL)
-   and it gets baked into the app for you.
+1. Move **`apk-builder.yml`** (repo root) to **`.github/workflows/android-apk.yml`**:
+   - *On GitHub:* open `apk-builder.yml` → copy → **Add file → Create new file** →
+     name it `.github/workflows/android-apk.yml` → paste → **Commit**.
+   - *Locally:* `mkdir .github\workflows` then `git mv apk-builder.yml .github/workflows/android-apk.yml`, `git push`.
+2. Go to **Actions → Build Android APK → Run workflow**. Optionally type your
+   **server URL** (e.g. `http://192.168.1.25:3000` — your PC's LAN IP, or your
+   hosted https URL) — it gets baked into the app automatically.
 3. When the run turns green (~5 min), download **`habitflow-debug-apk`** from the
-   run's *Artifacts* section, unzip, and copy `habitflow-debug.apk` to your phone
+   run's *Artifacts* section, unzip, and copy the APK to your phone
    (USB / WhatsApp / Drive / email).
-4. On the phone: tap the APK → allow *"Install unknown apps"* for your browser/files
-   app → **Install**. Debug APKs are signed with the standard debug key, so they
-   install on any Android device without a Play account.
+4. On the phone: tap the APK → allow *"Install unknown apps"* for your
+   browser/files app → **Install**. Debug APKs are signed with the standard debug
+   key, so they install on any Android device — no Play account needed.
+
+From then on, every push that touches `mobile/` auto-builds a fresh APK artifact
+for you.
 
 #### Option B — locally with Gradle / Android Studio
 

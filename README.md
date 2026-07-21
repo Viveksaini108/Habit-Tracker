@@ -6,7 +6,7 @@ A full-stack habit tracker that feels alive from the first load: daily check-ins
 
 ## Features
 
-- **Android & iOS apps** — a Capacitor native shell in [`mobile/`](mobile) with custom icons, splash screens and R8-minified release builds (~5–8 MB). **No Android Studio needed:** a GitHub Actions workflow builds an installable APK in the cloud and attaches it to the run. See **[MOBILE.md](MOBILE.md)**.
+- **Android & iOS apps** — a Capacitor native shell in [`mobile/`](mobile) with custom icons, splash screens and R8-minified release builds (~5–8 MB). **No Android Studio needed:** activate the included cloud APK builder (`apk-builder.yml` → `.github/workflows/`) and GitHub Actions produces an installable APK per run. See **[MOBILE.md](MOBILE.md)**.
 - **Offline mode** — the app opens without network (service-worker shell cache), check-ins queue on the device with an idempotent, replay-safe outbox, and **auto-sync to the online database** the moment you're back online. The server stays the source of truth. Details in [MOBILE.md §6](MOBILE.md#6-offline-mode-track-habits-without-network).
 - **Settings** — profile editing, theme selection, full JSON data export and account controls at `/settings`.
 - **Authentication** — register / login / logout with signed, encrypted session cookies (iron-session) and bcrypt password hashing.
