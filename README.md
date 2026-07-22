@@ -33,7 +33,8 @@ npm run dev        # http://localhost:3000
 The database is created and seeded automatically into `data/habitflow.db` on first request.
 
 **Demo account:** `demo@habitflow.app` / `demo1234`
-(or click “Explore with the demo account” on the sign-in page)
+(or click “Explore with the demo account” on the sign-in page).
+On a public deployment, disable it with `SEED_DEMO=0` — see *Environment*.
 
 ### Other scripts
 
@@ -104,6 +105,7 @@ mobile/                          # Capacitor native shell (Android + iOS)
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `SESSION_SECRET` | built-in dev value | 32+ char secret for cookie encryption — set it in production |
+| `SEED_DEMO` | enabled | Set to `0` to skip the demo account when a fresh database seeds (the shared challenge library still seeds). The demo button on the sign-in page hides automatically. To remove a demo account from an **existing** database: `node scripts/remove-demo.mjs` |
 
 ## License
 

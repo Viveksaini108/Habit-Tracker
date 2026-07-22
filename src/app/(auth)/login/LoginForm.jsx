@@ -4,8 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui';
 import { IconSparkles } from '@/components/icons';
+import PasswordInput from '@/components/PasswordInput';
 
-export default function LoginForm() {
+export default function LoginForm({ demoEnabled = true }) {
   const router = useRouter();
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
@@ -39,20 +40,24 @@ export default function LoginForm() {
 
   return (
     <form onSubmit={submit} className="space-y-4" noValidate>
-      <button
-        type="button"
-        onClick={useDemo}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2.5 text-sm font-semibold text-accent-strong transition hover:border-accent/50 hover:bg-accent/15"
-      >
-        <IconSparkles className="h-4 w-4" />
-        Explore with the demo account
-      </button>
+      {demoEnabled ? (
+        <>
+          <button
+            type="button"
+            onClick={useDemo}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2.5 text-sm font-semibold text-accent-strong transition hover:border-accent/50 hover:bg-accent/15"
+          >
+            <IconSparkles className="h-4 w-4" />
+            Explore with the demo account
+          </button>
 
-      <div className="relative flex items-center gap-3 text-xs font-medium text-faint">
-        <span className="h-px flex-1 bg-soft2" />
-        or sign in with your email
-        <span className="h-px flex-1 bg-soft2" />
-      </div>
+          <div className="relative flex items-center gap-3 text-xs font-medium text-faint">
+            <span className="h-px flex-1 bg-soft2" />
+            or sign in with your email
+            <span className="h-px flex-1 bg-soft2" />
+          </div>
+        </>
+      ) : null}
 
       <div>
         <label className="label" htmlFor="email">Email</label>
@@ -67,19 +72,11 @@ export default function LoginForm() {
           required
         />
       </div>
-      <div>
-        <label className="label" htmlFor="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          className="input"
-          placeholder="••••••••"
-          value={form.password}
-          onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-          autoComplete="current-password"
-          required
-        />
-      </div>
+      <PasswordInput
+        value={form.password}
+        onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+        autoComplete="current-password"
+      />
 
       {error ? (
         <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700" role="alert">
@@ -90,9 +87,11 @@ export default function LoginForm() {
       <Button type="submit" loading={loading} className="w-full">
         Sign in
       </Button>
-      <p className="text-center text-xs text-faint">
-        Demo account: demo@habitflow.app · demo1234
-      </p>
+      {demoEnabled ? (
+        <p className="text-center text-xs text-faint">
+          Demo account: demo@habitflow.app · demo1234
+        </p>
+      ) : null}
     </form>
   );
 }

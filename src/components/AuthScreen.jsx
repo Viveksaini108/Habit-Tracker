@@ -16,8 +16,21 @@ export default function AuthScreen({ title, subtitle, children, footer }) {
     <div className="flex min-h-screen">
       {/* Brand panel */}
       <div className="relative hidden w-[46%] flex-col justify-between overflow-hidden bg-shell p-10 lg:flex">
+        {/* Artwork: stepping stones rising toward the sunrise — "small steps, big change" */}
         <div
-          className="pointer-events-none absolute inset-0 opacity-60"
+          className="pointer-events-none absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/auth-bg.jpg')" }}
+        />
+        {/* Readability overlay */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(180deg, rgb(var(--shell) / 0.55) 0%, rgb(var(--shell) / 0.25) 35%, rgb(var(--shell) / 0.55) 100%)',
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-40"
           style={{
             background:
               'radial-gradient(40rem 24rem at 20% 10%, rgb(var(--accent) / 0.4), transparent 60%), radial-gradient(36rem 22rem at 90% 90%, rgb(var(--accent2) / 0.35), transparent 60%)',
@@ -60,8 +73,13 @@ export default function AuthScreen({ title, subtitle, children, footer }) {
       </div>
 
       {/* Form panel */}
-      <div className="flex flex-1 items-center justify-center bg-page px-4 py-10">
-        <div className="w-full max-w-md animate-fade-up">
+      <div className="relative flex flex-1 items-center justify-center overflow-hidden bg-page px-4 py-10">
+        {/* Soft backdrop of the artwork on small screens (the brand panel is hidden there) */}
+        <div
+          className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.12] lg:hidden"
+          style={{ backgroundImage: "url('/auth-bg.jpg')" }}
+        />
+        <div className="relative w-full max-w-md animate-fade-up">
           <div className="mb-6 flex items-center gap-2.5 lg:hidden">
             <IconLogo className="h-9 w-9" />
             <span className="text-lg font-extrabold text-ink">HabitFlow</span>

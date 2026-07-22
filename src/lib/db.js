@@ -112,8 +112,12 @@ export function getDb() {
   db.exec(SCHEMA);
 
   // Seed on first boot so the app "feels alive" immediately.
-  const row = db.prepare('SELECT COUNT(*) AS c FROM users').get();
-  if (Number(row.c) === 0) {
+  // "Virgin" = no users AND no challenge library — so a database seeded with
+  // SEED_DEMO=0, or one whose demo account was later removed, never triggers
+  // a re-seed (which would also duplicate the challenge library).
+  const users = Number(db.prepare('SELECT COUNT(*) AS c FROM users').get().c);
+  const challenges = Number(db.prepare('SELECT COUNT(*) AS c FROM challenges').get().c);
+  if (users === 0 && challenges === 0) {
     seedDatabase(db);
   }
 

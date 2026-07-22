@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui';
+import PasswordInput from '@/components/PasswordInput';
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -61,20 +62,13 @@ export default function RegisterForm() {
           required
         />
       </div>
-      <div>
-        <label className="label" htmlFor="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          className="input"
-          placeholder="8+ characters"
-          value={form.password}
-          onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-          autoComplete="new-password"
-          required
-        />
-        <p className="mt-1.5 text-xs text-faint">At least 8 characters. We start you off with four starter categories.</p>
-      </div>
+      <PasswordInput
+        placeholder="8+ characters"
+        value={form.password}
+        onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+        autoComplete="new-password"
+        hint="At least 8 characters. We start you off with four starter categories."
+      />
 
       {error ? (
         <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700" role="alert">

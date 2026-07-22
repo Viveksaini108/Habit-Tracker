@@ -10,13 +10,15 @@ export default async function LoginPage() {
   const user = await getCurrentUser();
   if (user) redirect('/dashboard');
 
+  const demoEnabled = process.env.SEED_DEMO !== '0';
+
   return (
     <AuthScreen
       title="Welcome back"
       subtitle="Sign in to keep your streaks alive."
       footer={<AuthFooterLink text="New to HabitFlow?" href="/register" linkText="Create an account" />}
     >
-      <LoginForm />
+      <LoginForm demoEnabled={demoEnabled} />
     </AuthScreen>
   );
 }

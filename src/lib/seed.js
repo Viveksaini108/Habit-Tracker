@@ -388,14 +388,20 @@ const REFLECTION_SEED = [
 export function seedDatabase(db) {
   const rand = mulberry32(20260721);
   const today = todayKey();
+  // Public deployments can opt out of the demo account: set SEED_DEMO=0.
+  // The global challenge library below still seeds either way.
+  const demoEnabled = process.env.SEED_DEMO !== '0';
 
-  // ---- users -------------------------------------------------------------
-  const passwordHash = bcrypt.hashSync('demo1234', 10);
-  const userId = Number(
-    db
-      .prepare('INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)')
-      .run('Alex Carter', 'demo@habitflow.app', passwordHash).lastInsertRowid
-  );
+  // ---- users ---------------------------------------------------------------
+  let userId = null;
+  if (demoEnabled) {
+    const passwordHash = bcrypt.hashSync('demo1234', 10);
+    userId = Number(
+      db
+        .prepare('INSERT INTO users (name, email, password_hash) VALUES (?, ?, ?)')
+        .run('Alex Carter', 'demo@habitflow.app', passwordHash).lastInsertRowid
+    );
+  }
 
   // ---- challenge library (global) ---------------------------------------
   const challengeIds = [];
@@ -411,6 +417,8 @@ export function seedDatabase(db) {
       )
     );
   }
+
+  if (!demoEnabled) return { userId: null }; // library only — no demo account, no demo data
 
   // ---- categories ---------------------------------------------------------
   const catIds = {};
