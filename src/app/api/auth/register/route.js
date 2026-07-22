@@ -1,13 +1,11 @@
 import bcrypt from 'bcryptjs';
-import { ok, fail, cleanText } from '@/lib/api';
+import { ok, fail, cleanText, EMAIL_RE } from '@/lib/api';
 import { findUserByEmail, createUser } from '@/lib/data';
 import { getDb } from '@/lib/db';
 import { seedStarterCategories } from '@/lib/seed';
 import { getSession, signIn } from '@/lib/session';
 
 export const dynamic = 'force-dynamic';
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export async function POST(request) {
   let body;

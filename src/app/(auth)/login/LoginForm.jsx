@@ -5,8 +5,20 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui';
 import { IconSparkles } from '@/components/icons';
 import PasswordInput from '@/components/PasswordInput';
+import GoogleAuthButton from '@/components/GoogleAuthButton';
+import { isEmail } from '@/lib/email';
 
-export default function LoginForm({ demoEnabled = true }) {
+function Divider({ children }) {
+  return (
+    <div className="relative flex items-center gap-3 text-xs font-medium text-faint">
+      <span className="h-px flex-1 bg-soft2" />
+      {children}
+      <span className="h-px flex-1 bg-soft2" />
+    </div>
+  );
+}
+
+export default function LoginForm({ demoEnabled = true, googleClientId = '' }) {
   const router = useRouter();
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
@@ -15,6 +27,10 @@ export default function LoginForm({ demoEnabled = true }) {
   const submit = async (e) => {
     e.preventDefault();
     setError('');
+    if (!isEmail(form.email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch('/api/auth/login', {
@@ -40,30 +56,16 @@ export default function LoginForm({ demoEnabled = true }) {
 
   return (
     <form onSubmit={submit} className="space-y-4" noValidate>
-      {demoEnabled ? (
-        <>
-          <button
-            type="button"
-            onClick={useDemo}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2.5 text-sm font-semibold text-accent-strong transition hover:border-accent/50 hover:bg-accent/15"
-          >
-            <IconSparkles className="h-4 w-4" />
-            Explore with the demo account
-          </button>
+      <GoogleAuthButton clientId={googleClientId} text="continue_with" onError={setError} />
 
-          <div className="relative flex items-center gap-3 text-xs font-medium text-faint">
-            <span className="h-px flex-1 bg-soft2" />
-            or sign in with your email
-            <span className="h-px flex-1 bg-soft2" />
-          </div>
-        </>
-      ) : null}
+      {googleClientId ? <Divider>or continue with email</Divider> : null}
 
       <div>
         <label className="label" htmlFor="email">Email</label>
         <input
           id="email"
           type="email"
+          inputMode="email"
           className="input"
           placeholder="you@example.com"
           value={form.email}
@@ -87,10 +89,21 @@ export default function LoginForm({ demoEnabled = true }) {
       <Button type="submit" loading={loading} className="w-full">
         Sign in
       </Button>
+
       {demoEnabled ? (
-        <p className="text-center text-xs text-faint">
-          Demo account: demo@habitflow.app · demo1234
-        </p>
+        <>
+          <button
+            type="button"
+            onClick={useDemo}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-4 py-2.5 text-sm font-semibold text-accent-strong transition hover:border-accent/50 hover:bg-accent/15"
+          >
+            <IconSparkles className="h-4 w-4" />
+            Explore with the demo account
+          </button>
+          <p className="text-center text-xs text-faint">
+            Demo account: demo@habitflow.app · demo1234
+          </p>
+        </>
       ) : null}
     </form>
   );

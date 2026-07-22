@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { ok, fail, cleanText } from '@/lib/api';
+import { ok, fail, isEmail, normalizeEmail } from '@/lib/api';
 import { findUserByEmail } from '@/lib/data';
 import { getSession, signIn } from '@/lib/session';
 
@@ -13,10 +13,11 @@ export async function POST(request) {
     return fail('Invalid request body');
   }
 
-  const email = cleanText(body.email, 120).toLowerCase();
+  const email = normalizeEmail(body.email);
   const password = typeof body.password === 'string' ? body.password : '';
 
   if (!email || !password) return fail('Email and password are required');
+  if (!isEmail(email)) return fail('Please enter a valid email address');
 
   const user = findUserByEmail(email);
   if (!user || !bcrypt.compareSync(password, user.password_hash)) {

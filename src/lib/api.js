@@ -26,3 +26,6 @@ export const isDateKey = (v) => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.t
 export const isMonthKey = (v) => typeof v === 'string' && /^\d{4}-\d{2}$/.test(v);
 
 export const isHexColor = (v) => typeof v === 'string' && /^#[0-9a-fA-F]{6}$/.test(v);
+
+/** Practical email format check used by auth routes + client forms. */
+export { EMAIL_RE, isEmail, normalizeEmail } from './email.js';

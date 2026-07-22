@@ -9,7 +9,7 @@ A full-stack habit tracker that feels alive from the first load: daily check-ins
 - **Android & iOS apps** — a Capacitor native shell in [`mobile/`](mobile) with custom icons, splash screens and R8-minified release builds (~5–8 MB). **No Android Studio needed:** activate the included cloud APK builder (`apk-builder.yml` → `.github/workflows/`) and GitHub Actions produces an installable APK per run. See **[MOBILE.md](MOBILE.md)**.
 - **Offline mode** — the app opens without network (service-worker shell cache), check-ins queue on the device with an idempotent, replay-safe outbox, and **auto-sync to the online database** the moment you're back online. The server stays the source of truth. Details in [MOBILE.md §6](MOBILE.md#6-offline-mode-track-habits-without-network).
 - **Settings** — profile editing, theme selection, full JSON data export and account controls at `/settings`.
-- **Authentication** — register / login / logout with signed, encrypted session cookies (iron-session) and bcrypt password hashing.
+- **Authentication** — register / login / logout with signed, encrypted session cookies (iron-session) and bcrypt password hashing; **Sign in with Google** (one-click accounts via Google Identity Services, verified server-side); strict email-format validation on both client and server; show/hide password toggles.
 - **Dashboard** — today's checklist with optimistic toggles, streak flames, stat cards, week-at-a-glance, active challenges, latest notes and personalized insights.
 - **Habits** — full CRUD: name, description, category, color, weekly target (1–7×), **start & end dates**, archive/restore, delete with confirm. Per-habit detail page with a 6-month heatmap, 14-day backfill grid and progress notes.
 - **Categories** — create / rename / recolor / delete; habits gracefully become “Uncategorized”.
@@ -106,6 +106,21 @@ mobile/                          # Capacitor native shell (Android + iOS)
 | --- | --- | --- |
 | `SESSION_SECRET` | built-in dev value | 32+ char secret for cookie encryption — set it in production |
 | `SEED_DEMO` | enabled | Set to `0` to skip the demo account when a fresh database seeds (the shared challenge library still seeds). The demo button on the sign-in page hides automatically. To remove a demo account from an **existing** database: `node scripts/remove-demo.mjs` |
+| `GOOGLE_CLIENT_ID` | unset | Enables the **Sign in with Google** button (see below). Free at Google Cloud, no billing required. |
+
+### Sign in with Google (₹0 — one-time ~15 min setup)
+
+1. [console.cloud.google.com](https://console.cloud.google.com) → create a project (free).
+2. **APIs & Services → OAuth consent screen** → External → fill app name + your email → Save.
+3. **Credentials → Create credentials → OAuth client ID** → type **Web application**:
+   - **Authorized JavaScript origins:** add `http://localhost:3000` and your deployed URL, e.g. `https://habit-tracker-xxxx.onrender.com`
+   - No redirect URI needed for the button flow.
+4. Copy the **Client ID** (`….apps.googleusercontent.com`) and set `GOOGLE_CLIENT_ID` — locally in `.env.local`, on Render under **Environment** → redeploy.
+
+The button appears on both sign-in and create-account pages (verified email ⇒
+Google sign-in doubles as sign-up). It hides itself wherever Google isn't
+configured, and inside the native apps for now — Google refuses OAuth inside
+embedded WebViews; in-app Google sign-in comes with a Custom-Tab flow (Phase 2).
 
 ## License
 

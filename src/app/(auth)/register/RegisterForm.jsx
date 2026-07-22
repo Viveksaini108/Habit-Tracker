@@ -4,8 +4,10 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui';
 import PasswordInput from '@/components/PasswordInput';
+import GoogleAuthButton from '@/components/GoogleAuthButton';
+import { isEmail } from '@/lib/email';
 
-export default function RegisterForm() {
+export default function RegisterForm({ googleClientId = '' }) {
   const router = useRouter();
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
@@ -14,6 +16,10 @@ export default function RegisterForm() {
   const submit = async (e) => {
     e.preventDefault();
     setError('');
+    if (!isEmail(form.email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch('/api/auth/register', {
@@ -37,6 +43,16 @@ export default function RegisterForm() {
 
   return (
     <form onSubmit={submit} className="space-y-4" noValidate>
+      <GoogleAuthButton clientId={googleClientId} text="signup_with" onError={setError} />
+
+      {googleClientId ? (
+        <div className="relative flex items-center gap-3 text-xs font-medium text-faint">
+          <span className="h-px flex-1 bg-soft2" />
+          or sign up with email
+          <span className="h-px flex-1 bg-soft2" />
+        </div>
+      ) : null}
+
       <div>
         <label className="label" htmlFor="name">Name</label>
         <input
