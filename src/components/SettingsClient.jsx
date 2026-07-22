@@ -4,9 +4,19 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { THEMES, THEME_COOKIE } from '@/lib/themes';
 import { Button, Spinner } from './ui';
+import PasswordInput from './PasswordInput';
 import {
   IconUser, IconCheck, IconLogout, IconSparkles, IconChevronRight, IconJournal,
 } from './icons';
+
+function IconLock({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="11" width="18" height="11" rx="2" />
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+    </svg>
+  );
+}
 
 function IconDownload({ className }) {
   return (
@@ -150,6 +160,110 @@ function AppearanceSection({ initialTheme }) {
   );
 }
 
+function PasswordSection({ hasPassword }) {
+  const [current, setCurrent] = useState('');
+  const [next, setNext] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSaved(false);
+    if (next.length < 8) {
+      setError('New password must be at least 8 characters');
+      return;
+    }
+    if (next !== confirm) {
+      setError('Passwords don’t match');
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch('/api/auth/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword: current, newPassword: next }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || !json.ok) throw new Error(json.error || 'Could not update your password');
+      setCurrent('');
+      setNext('');
+      setConfirm('');
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err) {
+      setError(err.message || 'Could not update your password');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Section
+      icon={<IconLock className="h-5 w-5" />}
+      title={hasPassword ? 'Change password' : 'Set a password'}
+      subtitle={
+        hasPassword
+          ? 'Keep your account safe with a fresh password.'
+          : 'You signed up with Google — set a password to also sign in with email.'
+      }
+    >
+      <form onSubmit={submit} className="space-y-3">
+        {hasPassword ? (
+          <PasswordInput
+            id="pw-current"
+            label="Current password"
+            value={current}
+            onChange={(e) => setCurrent(e.target.value)}
+            autoComplete="current-password"
+            placeholder="Your current password"
+          />
+        ) : (
+          <p className="rounded-lg bg-accent/5 px-3 py-2 text-xs text-muted">
+            No current password needed — you&rsquo;re already signed in. After setting one you can use
+            either email + password or the Google button.
+          </p>
+        )}
+        <PasswordInput
+          id="pw-next"
+          label="New password"
+          placeholder="8+ characters"
+          value={next}
+          onChange={(e) => setNext(e.target.value)}
+          autoComplete="new-password"
+        />
+        <PasswordInput
+          id="pw-confirm"
+          label="Confirm new password"
+          placeholder="Type it again"
+          value={confirm}
+          onChange={(e) => setConfirm(e.target.value)}
+          autoComplete="new-password"
+        />
+        {error ? <p className="rounded-lg bg-rose-500/10 px-3 py-2 text-sm font-medium text-rose-600">{error}</p> : null}
+        <div className="flex items-center justify-end gap-2">
+          {saved ? (
+            <span className="flex items-center gap-1 text-sm font-semibold text-emerald-600">
+              <IconCheck className="h-4 w-4" /> {hasPassword ? 'Password updated' : 'Password set'}
+            </span>
+          ) : null}
+          <Button
+            type="submit"
+            size="sm"
+            loading={saving}
+            disabled={next.length < 8 || next !== confirm || (hasPassword && !current)}
+          >
+            {hasPassword ? 'Update password' : 'Set password'}
+          </Button>
+        </div>
+      </form>
+    </Section>
+  );
+}
+
 function DataSection() {
   const [downloading, setDownloading] = useState(false);
   const exportData = async () => {
@@ -221,11 +335,12 @@ function AccountSection() {
   );
 }
 
-export default function SettingsClient({ user, theme }) {
+export default function SettingsClient({ user, theme, hasPassword = true }) {
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
       <div className="space-y-4">
         <ProfileSection user={user} />
+        <PasswordSection hasPassword={hasPassword} />
         <DataSection />
       </div>
       <div className="space-y-4">

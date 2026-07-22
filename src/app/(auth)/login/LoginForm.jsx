@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui';
 import { IconSparkles } from '@/components/icons';
@@ -74,11 +75,21 @@ export default function LoginForm({ demoEnabled = true, googleClientId = '' }) {
           required
         />
       </div>
-      <PasswordInput
-        value={form.password}
-        onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-        autoComplete="current-password"
-      />
+      <div>
+        <PasswordInput
+          value={form.password}
+          onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+          autoComplete="current-password"
+        />
+        <p className="mt-1.5 text-right">
+          <Link
+            href="/forgot"
+            className="text-xs font-semibold text-accent-strong underline-offset-2 hover:underline"
+          >
+            Forgot password?
+          </Link>
+        </p>
+      </div>
 
       {error ? (
         <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700" role="alert">

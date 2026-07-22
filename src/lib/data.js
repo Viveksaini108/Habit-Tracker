@@ -39,6 +39,34 @@ export function getUserById(id) {
   return row ? R(row) : null;
 }
 
+/** True when the account signs in with a password (Google-only accounts: false). */
+export function userHasPassword(id) {
+  const row = getDb().prepare('SELECT password_hash FROM users WHERE id = ?').get(id);
+  return Boolean(row?.password_hash);
+}
+
+export function updateUserPassword(id, passwordHash) {
+  getDb().prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(passwordHash, id);
+}
+
+// ---------------------------------------------------------------------------
+// password resets (forgot-password tokens; we store only the SHA-256 hash)
+// ---------------------------------------------------------------------------
+export function createPasswordReset(userId, tokenHash, expiresAtIso) {
+  const db = getDb();
+  db.prepare('DELETE FROM password_resets WHERE user_id = ?').run(userId); // one active link per user
+  db.prepare('INSERT INTO password_resets (user_id, token_hash, expires_at) VALUES (?, ?, ?)')
+    .run(userId, tokenHash, expiresAtIso);
+}
+
+export function findPasswordResetByTokenHash(tokenHash) {
+  return getDb().prepare('SELECT * FROM password_resets WHERE token_hash = ?').get(tokenHash) ?? null;
+}
+
+export function deletePasswordResetsForUser(userId) {
+  getDb().prepare('DELETE FROM password_resets WHERE user_id = ?').run(userId);
+}
+
 // ---------------------------------------------------------------------------
 // categories
 // ---------------------------------------------------------------------------

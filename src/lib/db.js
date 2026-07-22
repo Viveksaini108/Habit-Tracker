@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
-  password_hash TEXT NOT NULL,
+  password_hash TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
@@ -88,12 +88,56 @@ CREATE TABLE IF NOT EXISTS user_challenges (
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+CREATE TABLE IF NOT EXISTS password_resets (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token_hash TEXT NOT NULL UNIQUE,
+  expires_at TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE INDEX IF NOT EXISTS idx_habits_user ON habits(user_id, archived);
 CREATE INDEX IF NOT EXISTS idx_entries_user_date ON entries(user_id, date);
 CREATE INDEX IF NOT EXISTS idx_entries_habit ON entries(habit_id);
 CREATE INDEX IF NOT EXISTS idx_notes_habit ON notes(habit_id);
 CREATE INDEX IF NOT EXISTS idx_user_challenges_user ON user_challenges(user_id, status);
+CREATE INDEX IF NOT EXISTS idx_password_resets_hash ON password_resets(token_hash);
 `;
+
+/**
+ * Older databases created `users.password_hash` as NOT NULL. Google-created
+ * accounts have no password, so the column must be nullable — rebuild the
+ * table (the standard safe SQLite recipe) and carry all rows over.
+ */
+function migrate(db) {
+  const cols = db.prepare('PRAGMA table_info(users)').all();
+  const hashCol = cols.find((c) => c.name === 'password_hash');
+  if (hashCol && Number(hashCol.notnull) === 1) {
+    db.exec('PRAGMA foreign_keys = OFF;');
+    try {
+      db.exec(`
+        BEGIN;
+        CREATE TABLE users_new (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT NOT NULL,
+          email TEXT NOT NULL UNIQUE,
+          password_hash TEXT,
+          created_at TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+        INSERT INTO users_new (id, name, email, password_hash, created_at)
+          SELECT id, name, email, password_hash, created_at FROM users;
+        DROP TABLE users;
+        ALTER TABLE users_new RENAME TO users;
+        COMMIT;
+      `);
+    } catch (err) {
+      db.exec('ROLLBACK;');
+      throw err;
+    } finally {
+      db.exec('PRAGMA foreign_keys = ON;');
+    }
+  }
+}
 
 const globalRef = globalThis;
 
@@ -110,6 +154,7 @@ export function getDb() {
   db.exec('PRAGMA journal_mode = WAL;');
   db.exec('PRAGMA foreign_keys = ON;');
   db.exec(SCHEMA);
+  migrate(db);
 
   // Seed on first boot so the app "feels alive" immediately.
   // "Virgin" = no users AND no challenge library — so a database seeded with
@@ -132,6 +177,7 @@ export function resetDb() {
   const db = new DatabaseSync(path.join(dataDir, 'habitflow.db'));
   db.exec('PRAGMA foreign_keys = ON;');
   db.exec(`
+    DROP TABLE IF EXISTS password_resets;
     DROP TABLE IF EXISTS user_challenges;
     DROP TABLE IF EXISTS challenges;
     DROP TABLE IF EXISTS reflections;

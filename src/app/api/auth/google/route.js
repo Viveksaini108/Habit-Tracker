@@ -1,5 +1,3 @@
-import bcrypt from 'bcryptjs';
-import crypto from 'node:crypto';
 import { ok, fail, cleanText } from '@/lib/api';
 import { findUserByEmail, createUser } from '@/lib/data';
 import { getDb } from '@/lib/db';
@@ -42,9 +40,9 @@ export async function POST(request) {
     user = createUser({
       name,
       email,
-      // Random unusable password — the account authenticates via Google
-      // (a password can still be set later if we add a "set password" flow).
-      passwordHash: bcrypt.hashSync(crypto.randomUUID(), 10),
+      // No password — the account authenticates via Google. The user can
+      // set one later from Settings ("Set a password") or "Forgot password".
+      passwordHash: null,
     });
     seedStarterCategories(getDb(), user.id);
   }

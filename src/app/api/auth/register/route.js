@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { ok, fail, cleanText, EMAIL_RE } from '@/lib/api';
+import { ok, fail, cleanText, isGmail } from '@/lib/api';
 import { findUserByEmail, createUser } from '@/lib/data';
 import { getDb } from '@/lib/db';
 import { seedStarterCategories } from '@/lib/seed';
@@ -20,7 +20,7 @@ export async function POST(request) {
   const password = typeof body.password === 'string' ? body.password : '';
 
   if (name.length < 2) return fail('Please enter your name (min 2 characters)');
-  if (!EMAIL_RE.test(email)) return fail('Please enter a valid email address');
+  if (!isGmail(email)) return fail('Please use a Gmail address (ending in @gmail.com) to create your account');
   if (password.length < 8) return fail('Password must be at least 8 characters');
 
   if (findUserByEmail(email)) return fail('An account with this email already exists', 409);

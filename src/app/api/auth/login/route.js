@@ -20,7 +20,11 @@ export async function POST(request) {
   if (!isEmail(email)) return fail('Please enter a valid email address');
 
   const user = findUserByEmail(email);
-  if (!user || !bcrypt.compareSync(password, user.password_hash)) {
+  if (!user) return fail('Invalid email or password', 401);
+  if (!user.password_hash) {
+    return fail('This account uses Google sign-in — tap “Continue with Google”, or set a password via “Forgot password”', 401);
+  }
+  if (!bcrypt.compareSync(password, user.password_hash)) {
     return fail('Invalid email or password', 401);
   }
 

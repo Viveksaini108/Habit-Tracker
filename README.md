@@ -9,7 +9,7 @@ A full-stack habit tracker that feels alive from the first load: daily check-ins
 - **Android & iOS apps** — a Capacitor native shell in [`mobile/`](mobile) with custom icons, splash screens and R8-minified release builds (~5–8 MB). **No Android Studio needed:** activate the included cloud APK builder (`apk-builder.yml` → `.github/workflows/`) and GitHub Actions produces an installable APK per run. See **[MOBILE.md](MOBILE.md)**.
 - **Offline mode** — the app opens without network (service-worker shell cache), check-ins queue on the device with an idempotent, replay-safe outbox, and **auto-sync to the online database** the moment you're back online. The server stays the source of truth. Details in [MOBILE.md §6](MOBILE.md#6-offline-mode-track-habits-without-network).
 - **Settings** — profile editing, theme selection, full JSON data export and account controls at `/settings`.
-- **Authentication** — register / login / logout with signed, encrypted session cookies (iron-session) and bcrypt password hashing; **Sign in with Google** (one-click accounts via Google Identity Services, verified server-side); strict email-format validation on both client and server; show/hide password toggles.
+- **Authentication** — register / login / logout with signed, encrypted session cookies (iron-session) and bcrypt password hashing; **Sign in with Google** (one-click accounts via Google Identity Services, verified server-side); **Gmail-only registration** with strict email validation on both client and server; **forgot password** with single-use, expiring reset links emailed through a free Gmail account (dev mode shows the link when mail isn't configured); **change / set password** in Settings — Google-created accounts can set their first password; show/hide password toggles.
 - **Dashboard** — today's checklist with optimistic toggles, streak flames, stat cards, week-at-a-glance, active challenges, latest notes and personalized insights.
 - **Habits** — full CRUD: name, description, category, color, weekly target (1–7×), **start & end dates**, archive/restore, delete with confirm. Per-habit detail page with a 6-month heatmap, 14-day backfill grid and progress notes.
 - **Categories** — create / rename / recolor / delete; habits gracefully become “Uncategorized”.
@@ -107,6 +107,7 @@ mobile/                          # Capacitor native shell (Android + iOS)
 | `SESSION_SECRET` | built-in dev value | 32+ char secret for cookie encryption — set it in production |
 | `SEED_DEMO` | enabled | Set to `0` to skip the demo account when a fresh database seeds (the shared challenge library still seeds). The demo button on the sign-in page hides automatically. To remove a demo account from an **existing** database: `node scripts/remove-demo.mjs` |
 | `GOOGLE_CLIENT_ID` | unset | Enables the **Sign in with Google** button (see below). Free at Google Cloud, no billing required. |
+| `EMAIL_USER` + `EMAIL_APP_PASSWORD` | unset | Sends forgot-password emails from your own Gmail (₹0 — see below). Outside production, a missing config just makes `/forgot` show the reset link on screen. |
 
 ### Sign in with Google (₹0 — one-time ~15 min setup)
 
@@ -121,6 +122,31 @@ The button appears on both sign-in and create-account pages (verified email ⇒
 Google sign-in doubles as sign-up). It hides itself wherever Google isn't
 configured, and inside the native apps for now — Google refuses OAuth inside
 embedded WebViews; in-app Google sign-in comes with a Custom-Tab flow (Phase 2).
+
+Registration with email+password is **Gmail-only** (`@gmail.com`), enforced in
+the form and on the server. Sign-in itself accepts any existing account email
+(so the demo account and Google-workspace users keep working).
+
+### Forgot password — free email via your own Gmail (one-time ~5 min)
+
+Reset links are single-use, SHA-256-hashed in the DB and expire in 30 minutes.
+To send them as real emails (₹0):
+
+1. Use (or create) a Gmail account, e.g. `you@gmail.com`.
+2. [myaccount.google.com/security](https://myaccount.google.com/security) → turn on **2-Step Verification**.
+3. Same page → search **"App passwords"** → create one named `HabitFlow` → copy the 16-character code.
+4. Set env vars — locally in `.env.local`, on Render under **Environment**:
+   ```
+   EMAIL_USER=you@gmail.com
+   EMAIL_APP_PASSWORD=the-16-char-code
+   ```
+5. Restart / redeploy. Done — `/forgot` now emails a styled reset link.
+
+Without these vars the flow still works: outside production the reset link is
+shown directly on the "check your inbox" screen (dev mode). Signed-in users can
+also change their password anytime in **Settings → Change password** — and
+Google-created accounts get a **Set a password** box instead (no current
+password needed), which unlocks email+password sign-in for them.
 
 ## License
 

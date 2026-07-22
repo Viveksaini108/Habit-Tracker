@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui';
 import PasswordInput from '@/components/PasswordInput';
 import GoogleAuthButton from '@/components/GoogleAuthButton';
-import { isEmail } from '@/lib/email';
+import { isEmail, isGmail } from '@/lib/email';
 
 export default function RegisterForm({ googleClientId = '' }) {
   const router = useRouter();
@@ -18,6 +18,10 @@ export default function RegisterForm({ googleClientId = '' }) {
     setError('');
     if (!isEmail(form.email)) {
       setError('Please enter a valid email address');
+      return;
+    }
+    if (!isGmail(form.email)) {
+      setError('Please use a Gmail address (ending in @gmail.com)');
       return;
     }
     setLoading(true);
@@ -71,12 +75,13 @@ export default function RegisterForm({ googleClientId = '' }) {
           id="email"
           type="email"
           className="input"
-          placeholder="you@example.com"
+          placeholder="you@gmail.com"
           value={form.email}
           onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
           autoComplete="email"
           required
         />
+        <p className="mt-1 text-[11px] text-faint">Only Gmail addresses (@gmail.com) can create an account.</p>
       </div>
       <PasswordInput
         placeholder="8+ characters"

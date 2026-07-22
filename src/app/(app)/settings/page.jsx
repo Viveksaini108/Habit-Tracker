@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { getCurrentUser } from '@/lib/session';
-import { getUserById } from '@/lib/data';
+import { getUserById, userHasPassword } from '@/lib/data';
 import { THEME_COOKIE, THEME_IDS, DEFAULT_THEME } from '@/lib/themes';
 import PageHeader from '@/components/PageHeader';
 import SettingsClient from '@/components/SettingsClient';
@@ -17,7 +17,7 @@ export default async function SettingsPage() {
   return (
     <div className="animate-fade-up">
       <PageHeader title="Settings" subtitle="Your profile, appearance and data — all in one place." />
-      <SettingsClient user={profile} theme={theme} />
+      <SettingsClient user={profile} theme={theme} hasPassword={userHasPassword(sessionUser.id)} />
     </div>
   );
 }
