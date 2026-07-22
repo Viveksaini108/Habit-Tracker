@@ -3,8 +3,7 @@
   "appName": "HabitFlow",
   "webDir": "www",
   "server": {
-    "url": "http://192.168.1.10:3000",
-    "cleartext": true,
+    "url": "https://habit-tracker-1-6o5t.onrender.com",
     "errorPath": "/index.html"
   },
   "android": {

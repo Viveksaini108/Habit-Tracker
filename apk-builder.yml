@@ -1,28 +1,24 @@
 name: Build Android APK
 
-# ─────────────────────────────────────────────────────────────────────────────
-# ONE-STEP ACTIVATION (repo owner):
-#   move this file to  .github/workflows/android-apk.yml  and push.
-#   Locally:   mkdir -p .github/workflows; git mv apk-builder.yml .github/workflows/android-apk.yml; git push
-#   GitHub UI: open this file → copy → repo root → Add file → create new file
-#              named .github/workflows/android-apk.yml → paste → commit.
-# (The Arena bot's credentials can't create workflow files — yours can.)
+# Builds an installable HabitFlow APK on GitHub's runners — no Android Studio.
 #
-# What it does once active:
-#   • Actions → "Build Android APK" → Run workflow — optionally type your server
-#     URL (e.g. http://192.168.1.25:3000) to bake it into the app
-#   • also auto-builds on every push that touches mobile/**
-#   • uploads  habitflow-debug.apk  as a downloadable run artifact + logs its size
-# ─────────────────────────────────────────────────────────────────────────────
+# How to use:  Actions → "Build Android APK" → Run workflow → download the
+# "habitflow-debug-apk" artifact when it's green (~5 min).
+#
+# Your live server (https://habit-tracker-1-6o5t.onrender.com) is BOTH the
+# default below and the value in mobile/capacitor.config.json, so every build
+# points at it automatically. Only type something else in the server_url box
+# for local Wi-Fi testing against your own PC (e.g. http://192.168.1.25:3000).
 
 on:
   workflow_dispatch:
     inputs:
       server_url:
         description: >-
-          HabitFlow server URL to bake into the app (e.g. http://192.168.1.25:3000).
-          Leave empty to keep the value from mobile/capacitor.config.json.
+          Server URL baked into the app. Leave the default (Render) for normal
+          use; use http://YOUR-PC-IP:3000 only for local Wi-Fi testing.
         required: false
+        default: "https://habit-tracker-1-6o5t.onrender.com"
         type: string
   push:
     paths:
@@ -49,17 +45,21 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Bake custom server URL into the app (optional)
+      - name: Bake server URL into the app
         if: ${{ inputs.server_url != '' }}
         env:
           SERVER_URL: ${{ inputs.server_url }}
         run: |
           node -e '
             const fs = require("fs");
-            const url = process.env.SERVER_URL;
+            let url = String(process.env.SERVER_URL || "").trim();
+            if (!url) { console.log("No server_url given — keeping mobile/capacitor.config.json value."); process.exit(0); }
+            if (!/^https?:\/\//i.test(url)) url = "https://" + url;   // tolerate missing protocol
+            url = url.replace(/\/+$/, "");                             // strip trailing slashes
             const cfgPath = "mobile/capacitor.config.json";
             const cfg = JSON.parse(fs.readFileSync(cfgPath, "utf8"));
             cfg.server.url = url;
+            if (url.startsWith("https://")) delete cfg.server.cleartext;  // cleartext only needed for http
             fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2) + "\n");
             const htmlPath = "mobile/www/index.html";
             const html = fs.readFileSync(htmlPath, "utf8")
