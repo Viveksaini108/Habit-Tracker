@@ -1,0 +1,26 @@
+# Keep the image small & builds fast — exclude everything the app doesn't need.
+node_modules
+.next
+out
+data
+*.db
+*.db-wal
+*.db-shm
+
+# not part of the web app image
+mobile
+docs
+uploads
+apk-builder.yml
+MOBILE.md
+*.png
+
+# vcs / misc
+.git
+.github
+.dockerignore
+Dockerfile
+fly.toml
+npm-debug.log*
+.DS_Store
+.env*.local

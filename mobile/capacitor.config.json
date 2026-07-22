@@ -1,0 +1,16 @@
+{
+  "appId": "app.habitflow.mobile",
+  "appName": "HabitFlow",
+  "webDir": "www",
+  "server": {
+    "url": "https://habit-tracker-1-6o5t.onrender.com",
+    "errorPath": "/index.html"
+  },
+  "android": {
+    "allowMixedContent": true
+  },
+  "ios": {
+    "contentInset": "automatic"
+  },
+  "backgroundColor": "#101226"
+}
